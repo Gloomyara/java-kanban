@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class TaskManager {
 
-    int id = 1;
+    int id = 0; //было нужно для тестов
 
     Task task = new Task();
     EpicTask epicTask = new EpicTask();
@@ -20,13 +20,13 @@ public class TaskManager {
 
         Integer taskId = object.getTaskId();
         Integer epicTaskId = object.getEpicTaskId();
-
+        //условие для создания подзадачи
         if ((epicTaskId != null) && (taskId != null)) {
 
             if (!subTask.taskMap.containsKey(taskId)) {
 
                 object.setTaskCreateDate(Calendar.getInstance());
-                id = subTask.createNewTask(object);
+                id = subTask.createNewTask(object);//возвращает ид+1
 
                 subTaskId = epicSubTaskIdMap.get(epicTaskId);
                 subTaskId.add(taskId);
@@ -42,28 +42,29 @@ public class TaskManager {
                 epicObject.setTaskStatus(epicStatusType(epicTaskId));
                 subTask.updateTask(object);
             }
-
+        //условие для создания эпика
         } else if (epicTaskId != null) {
             if (!epicTask.taskMap.containsKey(epicTaskId)) {
                 object.setTaskStatus(epicStatusType(epicTaskId));
                 object.setTaskCreateDate(Calendar.getInstance());
 
-                id = epicTask.createNewTask(object);
+                id = epicTask.createNewTask(object);//возвращает ид+1
                 epicSubTaskIdMap.put(epicTaskId, subTaskId);
             } else {
                 object.setTaskStatus(epicStatusType(epicTaskId));
                 if (object.getTaskStatus().equals(StatusType.DONE)) {
                     object.setCloseDate(Calendar.getInstance());
-                } else {
+                } else  {
                     object.setTaskUpdateDate(Calendar.getInstance());
                 }
                 epicTask.updateTask(object);
             }
+        //условие для создания просто задачи
         } else if(taskId != null) {
 
             if (!task.taskMap.containsKey(taskId)) {
                 object.setTaskCreateDate(Calendar.getInstance());
-                id = task.createNewTask(object);
+                id = task.createNewTask(object);//возвращает ид+1
             } else {
 
                 if (object.getTaskStatus().equals(StatusType.DONE)) {
@@ -77,7 +78,7 @@ public class TaskManager {
             System.out.println("Ошибка! задаче не присвоен ID");
         }
     }
-
+    //метод для статуса эпика
     public StatusType epicStatusType(int epicTaskId) {
         int counterNew = 0;
         int counterDone = 0;
@@ -103,6 +104,8 @@ public class TaskManager {
             return null;
         }
     }
+
+    //метод для печати всех подзадач 1 эпика
     void printOneEpicSubTasks (int epicTaskId) {
         if (epicTask.taskMap.containsKey(epicTaskId) && epicSubTaskIdMap.containsKey(epicTaskId)) {
             subTaskId = epicSubTaskIdMap.get(epicTaskId);

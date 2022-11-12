@@ -6,7 +6,7 @@ import java.util.HashMap;
 class Task {
 
     HashMap<Integer, TaskObject> taskMap = new HashMap<>();
-
+    //печать по типу
     public void printAllTasks() {
 
         if (!taskMap.isEmpty()) {
@@ -18,6 +18,7 @@ class Task {
         }
     }
 
+    //удалить по типу
     public void deleteAllTasks(){
 
         if (!taskMap.isEmpty()){
@@ -36,6 +37,7 @@ class Task {
         return null;
     }
 
+    //создать задачу
     public int createNewTask(TaskObject task) {
         int taskId = task.getTaskId();
         if (!taskMap.containsKey(taskId)) {
@@ -46,6 +48,8 @@ class Task {
         }
         return taskId + 1;
     }
+
+    //обновить задачу
     public void updateTask(TaskObject task) {
 
         int taskId = task.getTaskId();
@@ -71,6 +75,8 @@ class Task {
             System.out.println("Такой задачи нет");
         }
     }
+
+    //удалить по ID
     public String deleteOneTask(int id) {
 
         if (taskMap.containsKey(id)) {
@@ -79,7 +85,4 @@ class Task {
         }
         return "Задачи под таким ID нет.";
     }
-
-
-
 }

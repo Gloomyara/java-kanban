@@ -7,5 +7,8 @@ public class Main {
         System.out.println("Поехали!");
         Scanner scanner = new Scanner(System.in);
         TaskManager taskManager = new TaskManager();
+
+
+
     }
 }
