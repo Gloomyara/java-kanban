@@ -9,33 +9,49 @@ import java.util.List;
  * Обновление - любое изменение с помощью сообщений.
  */
 
-public class Task {
+public class TaskObject {
 
 
 
-    protected boolean isEpic = false;
-    protected int taskId;
-    protected String taskName;
-    protected StatusType taskStatus;
-    protected String taskDescription;
-    protected Calendar taskCreateDate;
-    protected Calendar taskUpdateDate;
-    protected Calendar taskCloseDate = null;
-    protected People taskAuthor;
-    protected People taskAppoint;
+    private boolean isEpic;
+    private boolean isSub;
+    private int taskId;
+    private String taskName;
+    private StatusType taskStatus;
+    private String taskDescription;
+    private Calendar taskCreateDate;
+    private Calendar taskUpdateDate;
+    private Calendar taskCloseDate = null;
+    private People taskAuthor;
+    private People taskAppoint;
 
-    public Task() {
-
+    public boolean isEpic() {
+        return isEpic;
     }
 
-    public Task(int taskId, String taskName, String taskDescription, StatusType statusName) {
-        taskCreateDate = Calendar.getInstance();
-        this.taskName = "Задача " + taskName;
+    public void setEpic(boolean epic) {
+        isEpic = epic;
+    }
+
+    public boolean isSub() {
+        return isSub;
+    }
+
+    public void setSub(boolean sub) {
+        isSub = sub;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public void setTaskDescription(String taskDescription) {
         this.taskDescription = taskDescription;
-        this.taskStatus = statusName;
-        this.taskId = taskId;
     }
 
+    public void setTaskCloseDate(Calendar taskCloseDate) {
+        this.taskCloseDate = taskCloseDate;
+    }
 
     void setCloseDate(Calendar date) {
         taskCloseDate = date;
@@ -103,8 +119,5 @@ public class Task {
     public String toString() {
         return "Номер задачи: " + taskId + " Название задачи: " + taskName + " Create date:" +
                 taskCreateDate.getTime() + " Update date:" + taskUpdateDate.getTime();
-    }
-
-    public void printAllTasks() {
     }
 }

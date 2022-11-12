@@ -15,9 +15,9 @@ public class Main {
                 int command = Integer.parseInt(scanner.nextLine());
 
                 if (command == 1) {
-                    taskManager.createTask();
+
                 } else if (command == 2) {
-                    taskManager.printAllTasks();
+
                 } else if (command == 3) {
 
                 } else if (command == 4) {

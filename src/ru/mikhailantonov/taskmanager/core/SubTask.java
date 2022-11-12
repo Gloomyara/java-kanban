@@ -4,11 +4,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 public class SubTask extends Task {
-    public SubTask(int taskId, String taskName, String taskDescription) {
+    int epicId;
+    public SubTask(int epicId, int taskId, String taskName, String taskDescription, StatusType statusName) {
         taskCreateDate = Calendar.getInstance();
         this.taskName = "Подзадача " + taskName;
         this.taskDescription = taskDescription;
-        this.taskStatus = StatusType.NEW;
+        this.taskStatus = statusName;
         this.taskId = taskId;
+        this.epicId = epicId;
     }
 }
