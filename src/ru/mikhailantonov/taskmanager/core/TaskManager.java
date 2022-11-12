@@ -1,214 +1,121 @@
 package ru.mikhailantonov.taskmanager.core;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
 
 public class TaskManager {
-    private HashMap<Integer, Task> taskList = new HashMap<>();
-    private HashMap<Integer, EpicTask> epicTaskList = new HashMap<>();
-    private HashMap<Integer, Integer> subTaskId = new HashMap<>();
 
-    int id = 0;
+    int id = 1;
 
-    public int createNewTask(Task task) {
-        int taskId = task.taskId;
-        if (!taskList.containsKey(taskId)) {
-            taskList.put(taskId, task);
-        } else {
-            System.out.println("Такая задача уже есть");
-            return taskId;
-        }
-        return taskId + 1;
-    }
+    Task task = new Task();
+    EpicTask epicTask = new EpicTask();
+    SubTask subTask = new SubTask();
+    private ArrayList<Integer> subTaskId = new ArrayList<>();
+    private HashMap<Integer, ArrayList<Integer>> epicSubTaskIdMap = new HashMap<>();
 
-    public int createNewSubTask(SubTask task) {
-        int epicId = task.epicId;
-        int taskId = task.taskId;
 
-        if (epicTaskList.containsKey(epicId)) {
-            EpicTask oneTask = epicTaskList.get(epicId);
-            System.out.println("Эпик " + oneTask.getTaskName() + "на связи");
+    public void manageTask(TaskObject object) {
 
-            oneTask.addSubTask(task);
-            subTaskId.put(taskId, epicId);
+        Integer taskId = object.getTaskId();
+        Integer epicTaskId = object.getEpicTaskId();
 
-        } else {
-            System.out.println("Такая задача уже есть");
-            return taskId;
-        }
-        return taskId + 1;
-    }
+        if ((epicTaskId != null) && (taskId != null)) {
 
-    public int createNewEpicTask(EpicTask task) {
-        int taskId = task.taskId;
-        if (!epicTaskList.containsKey(taskId)) {
+            if (!subTask.taskMap.containsKey(taskId)) {
 
-            epicTaskList.put(taskId, task);
-        } else {
-            System.out.println("Такая задача уже есть");
-            return taskId;
-        }
-        return taskId + 1;
-    }
+                object.setTaskCreateDate(Calendar.getInstance());
+                id = subTask.createNewTask(object);
 
-    public void refreshTask(Task task) {
+                subTaskId = epicSubTaskIdMap.get(epicTaskId);
+                subTaskId.add(taskId);
+                epicSubTaskIdMap.put(epicTaskId, subTaskId);
 
-        int taskId = task.taskId;
+            } else {
+                if (object.getTaskStatus().equals(StatusType.DONE)) {
+                    object.setCloseDate(Calendar.getInstance());
+                } else {
+                    object.setTaskUpdateDate(Calendar.getInstance());
+                }
+                TaskObject epicObject = epicTask.taskMap.get(epicTaskId);
+                epicObject.setTaskStatus(epicStatusType(epicTaskId));
+                subTask.updateTask(object);
+            }
 
-        if (taskList.containsKey(taskId)) {
+        } else if (epicTaskId != null) {
+            if (!epicTask.taskMap.containsKey(epicTaskId)) {
+                object.setTaskStatus(epicStatusType(epicTaskId));
+                object.setTaskCreateDate(Calendar.getInstance());
 
-            Task oneTask = taskList.get(task.taskId);
-            oneTask.taskStatus = task.taskStatus;
-            oneTask.taskName = task.taskName;
-            oneTask.taskDescription = task.taskDescription;
-            //oneTask.setTaskAppoint();
+                id = epicTask.createNewTask(object);
+                epicSubTaskIdMap.put(epicTaskId, subTaskId);
+            } else {
+                object.setTaskStatus(epicStatusType(epicTaskId));
+                if (object.getTaskStatus().equals(StatusType.DONE)) {
+                    object.setCloseDate(Calendar.getInstance());
+                } else {
+                    object.setTaskUpdateDate(Calendar.getInstance());
+                }
+                epicTask.updateTask(object);
+            }
+        } else if(taskId != null) {
 
-            if (oneTask.taskStatus == StatusType.DONE) {
-
-                oneTask.setCloseDate(Calendar.getInstance());
+            if (!task.taskMap.containsKey(taskId)) {
+                object.setTaskCreateDate(Calendar.getInstance());
+                id = task.createNewTask(object);
             } else {
 
-                oneTask.setTaskUpdateDate(Calendar.getInstance());
-            }
-
-        } else {
-            System.out.println("Такой задачи нет");
-        }
-    }
-
-    public void refreshSubTask(SubTask task) {
-
-        int epicId = task.epicId;
-        int taskId = task.taskId;
-
-        if (epicTaskList.containsKey(epicId)) {
-
-            EpicTask epicTask = epicTaskList.get(epicId);
-            SubTask subTask = epicTask.getSubTasks().get(taskId);
-
-            subTask.taskStatus = task.taskStatus;
-            if (subTask.taskStatus == StatusType.DONE) {
-
-                subTask.setCloseDate(Calendar.getInstance());
-            } else {
-
-                subTask.setTaskUpdateDate(Calendar.getInstance());
-            }
-            subTask.taskName = task.taskName;
-            subTask.taskDescription = task.taskDescription;
-            //subTask.setTaskAppoint();
-            epicTask.taskStatus = epicTask.epicStatusType();
-
-            if (epicTask.taskStatus == StatusType.DONE) {
-
-                epicTask.setCloseDate(Calendar.getInstance());
-            } else {
-
-                epicTask.setTaskUpdateDate(Calendar.getInstance());
+                if (object.getTaskStatus().equals(StatusType.DONE)) {
+                    object.setCloseDate(Calendar.getInstance());
+                } else {
+                    object.setTaskUpdateDate(Calendar.getInstance());
+                }
+                task.updateTask(object);
             }
         } else {
-            System.out.println("Такой задачи нет");
+            System.out.println("Ошибка! задаче не присвоен ID");
         }
     }
 
-    public void refreshEpicTask(EpicTask task) {
-
-        int taskId = task.taskId;
-
-        if (epicTaskList.containsKey(taskId)) {
-
-            EpicTask epicTask = epicTaskList.get(taskId);
-            epicTask.taskStatus = task.taskStatus;
-            epicTask.taskName = task.taskName;
-            epicTask.taskDescription = task.taskDescription;
-            epicTask.setTaskUpdateDate(Calendar.getInstance());
-
+    public StatusType epicStatusType(int epicTaskId) {
+        int counterNew = 0;
+        int counterDone = 0;
+        if (epicTask.taskMap.containsKey(epicTaskId) && epicSubTaskIdMap.containsKey(epicTaskId)) {
+            if (epicSubTaskIdMap.get(epicTaskId) == null) return StatusType.NEW;
+            subTaskId = epicSubTaskIdMap.get(epicTaskId);
+            for (int taskId : subTaskId) {
+                TaskObject object = subTask.taskMap.get(taskId);
+                if ((object.getTaskStatus() == null) || (object.getTaskStatus().equals(StatusType.NEW))) {
+                    counterNew++;
+                } else if (object.getTaskStatus().equals(StatusType.DONE)) {
+                    counterDone++;
+                }
+            }
+            if (counterNew == subTask.taskMap.size()) {
+                return StatusType.NEW;
+            } else if (counterDone == subTask.taskMap.size()) {
+                return StatusType.DONE;
+            }
+            return StatusType.IN_PROGRESS;
         } else {
-            System.out.println("Такой задачи нет");
+            System.out.println("Ошибка! эпик задача не найдена");
+            return null;
         }
     }
-
-    public String deleteOneTask(int id) {
-        if (subTaskId.containsKey(id)) {
-            EpicTask oneTask = (EpicTask) taskList.get(subTaskId.get(id));
-            oneTask.deleteOneTask(id);
-            return "Задача удалена.";
-        } else if (taskList.containsKey(id)) {
-            taskList.remove(id);
-            return "Задача удалена.";
-        } else if (epicTaskList.containsKey(id)) {
-            epicTaskList.remove(id);
-            return "Задача удалена.";
-        }
-        return "Задачи под таким ID нет.";
-    }
-
-    public void printAllTasks() {
-
-        if (!taskList.isEmpty()) {
-            for (Task oneTask : taskList.values()) {
-                System.out.println(oneTask.taskName);
+    void printOneEpicSubTasks (int epicTaskId) {
+        if (epicTask.taskMap.containsKey(epicTaskId) && epicSubTaskIdMap.containsKey(epicTaskId)) {
+            subTaskId = epicSubTaskIdMap.get(epicTaskId);
+            TaskObject epicObject = epicTask.taskMap.get(epicTaskId);
+            System.out.println("Подзадачи эпика " + epicObject.getTaskName() + ":");
+            for (int taskId : subTaskId) {
+                if (subTask.taskMap.containsKey(taskId)){
+                    TaskObject object = subTask.taskMap.get(taskId);
+                    System.out.println(object.getTaskName());
+                }
             }
         } else {
-            System.out.println("В списке нет задач");
+            System.out.println("Ошибка! эпик задача не найдена");
         }
-    }
-    public void printAllSubTasks() {
-
-        if (!epicTaskList.isEmpty()) {
-            for (EpicTask oneTask : epicTaskList.values()) {
-
-                System.out.println("Подзадачи эпика - " + oneTask.taskName + ":");
-                oneTask.printAllTasks();
-            }
-        } else {
-            System.out.println("В списке нет задач");
-        }
-    }
-
-    public void printAllEpicTasks() {
-
-        if (!epicTaskList.isEmpty()) {
-            for (EpicTask oneTask : epicTaskList.values()) {
-                System.out.println(oneTask.taskName);
-            }
-        } else {
-            System.out.println("В списке нет задач");
-        }
-    }
-
-    public void deleteAllTasks(){
-
-        if (!taskList.isEmpty()){
-            taskList.clear();
-            System.out.println("все задачи удалены");
-        } else {
-            System.out.println("Нечего удалять");
-        }
-    }
-
-    public void deleteAllSubTasks(){
-
-        if (!epicTaskList.isEmpty()) {
-            for (EpicTask oneTask : epicTaskList.values()) {
-                oneTask.deleteAllSubTasks();
-            }
-            System.out.println("все подзадачи удалены");
-        } else {
-            System.out.println("Нечего удалять");
-        }
-    }
-    public void deleteAllEpicTasks(){
-
-        if (!epicTaskList.isEmpty()){
-            epicTaskList.clear();
-            System.out.println("все эпик задачи удалены");
-        } else {
-            System.out.println("Нечего удалять");
-        }
-    }
-    public Task getOneTask(int taskId) {
-        
     }
 }

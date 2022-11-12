@@ -2,109 +2,84 @@ package ru.mikhailantonov.taskmanager.core;
 
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 
-/**
- * Задача. В ней могут содержаться сообщения, есть статус, даты создания, обновления и закрытия.
- * Обновление - любое изменение с помощью сообщений.
- */
+class Task {
 
-public class Task {
+    HashMap<Integer, TaskObject> taskMap = new HashMap<>();
 
+    public void printAllTasks() {
 
-
-    protected boolean isEpic = false;
-    protected int taskId;
-    protected String taskName;
-    protected StatusType taskStatus;
-    protected String taskDescription;
-    protected Calendar taskCreateDate;
-    protected Calendar taskUpdateDate;
-    protected Calendar taskCloseDate = null;
-    protected People taskAuthor;
-    protected People taskAppoint;
-
-    public Task() {
-
+        if (!taskMap.isEmpty()) {
+            for (TaskObject oneTask : taskMap.values()) {
+                System.out.println(oneTask.getTaskName());
+            }
+        } else {
+            System.out.println("В списке нет задач");
+        }
     }
 
-    public Task(int taskId, String taskName, String taskDescription, StatusType statusName) {
-        taskCreateDate = Calendar.getInstance();
-        this.taskName = "Задача " + taskName;
-        this.taskDescription = taskDescription;
-        this.taskStatus = statusName;
-        this.taskId = taskId;
-    }
+    public void deleteAllTasks(){
 
+        if (!taskMap.isEmpty()){
+            taskMap.clear();
+            System.out.println("все задачи удалены");
+        } else {
+            System.out.println("Нечего удалять");
+        }
+    }
+    public TaskObject getOneTask(int taskId) {
+        if (taskMap.containsKey(taskId)) {
 
-    void setCloseDate(Calendar date) {
-        taskCloseDate = date;
-    }
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-    public int getTaskId() {
-        return this.taskId;
-    }
-
-    public Calendar getTaskUpdateDate() {
-        return this.taskUpdateDate;
-    }
-
-    void setTaskUpdateDate(Calendar date) {
-        taskUpdateDate = date;
-    }
-
-    public Calendar getTaskCloseDate() {
-        if (taskCloseDate != null) return this.taskCloseDate;
+            return taskMap.get(taskId);
+        }
+        System.out.println("Задачи под таким ID нет.");
         return null;
     }
 
-    public Calendar getTaskCreateDate() {
-        return this.taskCreateDate;
+    public int createNewTask(TaskObject task) {
+        int taskId = task.getTaskId();
+        if (!taskMap.containsKey(taskId)) {
+            taskMap.put(taskId, task);
+        } else {
+            System.out.println("Такая задача уже есть");
+            return taskId;
+        }
+        return taskId + 1;
+    }
+    public void updateTask(TaskObject task) {
+
+        int taskId = task.getTaskId();
+
+        if (taskMap.containsKey(taskId)) {
+
+            TaskObject oneTask = taskMap.get(taskId);
+            oneTask.setTaskStatus(task.getTaskStatus());
+            oneTask.setTaskName(task.getTaskName());
+            oneTask.setTaskDescription(task.getTaskDescription());
+            oneTask.setTaskStatus(task.getTaskStatus());
+            //oneTask.setTaskAppoint();
+
+            if (oneTask.getTaskStatus() == StatusType.DONE) {
+
+                oneTask.setCloseDate(Calendar.getInstance());
+            } else {
+
+                oneTask.setTaskUpdateDate(Calendar.getInstance());
+            }
+
+        } else {
+            System.out.println("Такой задачи нет");
+        }
+    }
+    public String deleteOneTask(int id) {
+
+        if (taskMap.containsKey(id)) {
+            taskMap.remove(id);
+            return "Задача удалена.";
+        }
+        return "Задачи под таким ID нет.";
     }
 
-    public void setTaskCreateDate(Calendar date) {
-        taskCreateDate = date;
-    }
 
-    public String getTaskName() {
-        return this.taskName;
-    }
 
-    public String getTaskDescription() {
-        return this.taskDescription;
-    }
-
-    public People getTaskAuthor() {
-        return this.taskAuthor;
-    }
-
-    public void setTaskAuthor(People taskAuthor) {
-        this.taskAuthor = taskAuthor;
-    }
-
-    public People getTaskAppoint() {
-        return this.taskAppoint;
-    }
-
-    public void setTaskAppoint(People taskAppoint) {
-        this.taskAppoint = taskAppoint;
-    }
-
-    public StatusType getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void setTaskStatus(StatusType statusType) {
-        this.taskStatus = statusType;
-    }
-
-    public String toString() {
-        return "Номер задачи: " + taskId + " Название задачи: " + taskName + " Create date:" +
-                taskCreateDate.getTime() + " Update date:" + taskUpdateDate.getTime();
-    }
-
-    public void printAllTasks() {
-    }
 }

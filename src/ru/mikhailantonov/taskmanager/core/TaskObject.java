@@ -1,45 +1,18 @@
 package ru.mikhailantonov.taskmanager.core;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-
-/**
- * Задача. В ней могут содержаться сообщения, есть статус, даты создания, обновления и закрытия.
- * Обновление - любое изменение с помощью сообщений.
- */
 
 public class TaskObject {
 
-
-
-    private boolean isEpic;
-    private boolean isSub;
-    private int taskId;
+    private Integer taskId;
+    private Integer epicTaskId;
     private String taskName;
     private StatusType taskStatus;
     private String taskDescription;
     private Calendar taskCreateDate;
     private Calendar taskUpdateDate;
     private Calendar taskCloseDate = null;
-    private People taskAuthor;
-    private People taskAppoint;
 
-    public boolean isEpic() {
-        return isEpic;
-    }
-
-    public void setEpic(boolean epic) {
-        isEpic = epic;
-    }
-
-    public boolean isSub() {
-        return isSub;
-    }
-
-    public void setSub(boolean sub) {
-        isSub = sub;
-    }
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
@@ -49,17 +22,15 @@ public class TaskObject {
         this.taskDescription = taskDescription;
     }
 
-    public void setTaskCloseDate(Calendar taskCloseDate) {
-        this.taskCloseDate = taskCloseDate;
-    }
-
-    void setCloseDate(Calendar date) {
+    public void setCloseDate(Calendar date) {
         taskCloseDate = date;
     }
+
     public void setTaskId(int taskId) {
         this.taskId = taskId;
     }
-    public int getTaskId() {
+
+    public Integer getTaskId() {
         return this.taskId;
     }
 
@@ -92,28 +63,20 @@ public class TaskObject {
         return this.taskDescription;
     }
 
-    public People getTaskAuthor() {
-        return this.taskAuthor;
-    }
-
-    public void setTaskAuthor(People taskAuthor) {
-        this.taskAuthor = taskAuthor;
-    }
-
-    public People getTaskAppoint() {
-        return this.taskAppoint;
-    }
-
-    public void setTaskAppoint(People taskAppoint) {
-        this.taskAppoint = taskAppoint;
-    }
-
     public StatusType getTaskStatus() {
         return taskStatus;
     }
 
     public void setTaskStatus(StatusType statusType) {
         this.taskStatus = statusType;
+    }
+
+    public Integer getEpicTaskId() {
+        return epicTaskId;
+    }
+
+    public void setEpicTaskId(int epicTaskId) {
+        this.epicTaskId = epicTaskId;
     }
 
     public String toString() {
