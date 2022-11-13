@@ -42,6 +42,8 @@ class Task {
     //создать задачу
     public void createNewTask(TaskObject task) {
         int taskId = task.getTaskId();
+        task.setTaskCreateDate(Calendar.getInstance());
+        task.setTaskUpdateDate(Calendar.getInstance());
         if (!taskMap.containsKey(taskId)) {
             taskMap.put(taskId, task);
         } else {
@@ -61,7 +63,6 @@ class Task {
             oneTask.setTaskName(task.getTaskName());
             oneTask.setTaskDescription(task.getTaskDescription());
             oneTask.setTaskStatus(task.getTaskStatus());
-            //oneTask.setTaskAppoint();
 
             if (oneTask.getTaskStatus() == StatusType.DONE) {
 

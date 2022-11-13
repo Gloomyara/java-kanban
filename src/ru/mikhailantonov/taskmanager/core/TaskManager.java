@@ -49,26 +49,16 @@ public class TaskManager {
             if (!epicTask.taskMap.containsKey(taskId)) {
                 object.setTaskId(taskId);
                 object.setTaskStatus(epicStatusType(taskId));
-                object.setTaskCreateDate(Calendar.getInstance());
-                object.setTaskUpdateDate(Calendar.getInstance());
                 epicTask.createNewTask(object);
                 newId = id + 1;
                 epicSubTaskIdMap.put(taskId, subTaskIdList);
             } else {
-                object.setTaskStatus(epicStatusType(taskId));
-                if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    object.setCloseDate(Calendar.getInstance());
-                } else {
-                    object.setTaskUpdateDate(Calendar.getInstance());
-                }
                 epicTask.updateTask(object);
             }
             //условие для создания подзадачи
         } else if (epicTaskId != null) {
             if (!subTask.taskMap.containsKey(taskId)) {
                 object.setTaskId(taskId);
-                object.setTaskCreateDate(Calendar.getInstance());
-                object.setTaskUpdateDate(Calendar.getInstance());
                 subTask.createNewTask(object);
                 newId = id + 1;
                 if (epicSubTaskIdMap.get(epicTaskId) != null) subTaskIdList = epicSubTaskIdMap.get(epicTaskId);
@@ -76,11 +66,6 @@ public class TaskManager {
                 epicSubTaskIdMap.put(epicTaskId, subTaskIdList);
 
             } else {
-                if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    object.setCloseDate(Calendar.getInstance());
-                } else {
-                    object.setTaskUpdateDate(Calendar.getInstance());
-                }
                 subTask.updateTask(object);
                 TaskObject epicObject = epicTask.taskMap.get(epicTaskId);
                 epicObject.setTaskStatus(epicStatusType(epicTaskId));
@@ -89,17 +74,9 @@ public class TaskManager {
         } else {
 
             if (!task.taskMap.containsKey(taskId)) {
-                object.setTaskCreateDate(Calendar.getInstance());
-                object.setTaskUpdateDate(Calendar.getInstance());
                 task.createNewTask(object);
                 newId = id + 1;
             } else {
-
-                if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    object.setCloseDate(Calendar.getInstance());
-                } else {
-                    object.setTaskUpdateDate(Calendar.getInstance());
-                }
                 task.updateTask(object);
             }
         }
@@ -161,7 +138,7 @@ public class TaskManager {
             return "Задача ID: " + id + " удалена.";
         } else if (subTask.taskMap.containsKey(id)) {
             subTask.taskMap.remove(id);
-            return "Задача ID: " + id + " удалена.";
+            return "Подзадача ID: " + id + " удалена.";
         } else if (epicTask.taskMap.containsKey(id)) {
             if (epicSubTaskIdMap.containsKey(id)) {
                 subTaskIdList = epicSubTaskIdMap.get(id);
