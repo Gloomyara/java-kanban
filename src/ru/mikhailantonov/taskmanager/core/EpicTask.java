@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 class EpicTask extends Task {
 
-    HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
+    private HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
 
     //создать эпик
     @Override

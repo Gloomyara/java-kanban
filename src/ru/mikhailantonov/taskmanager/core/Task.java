@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 class Task {
 
-    HashMap<Integer, TaskObject> taskMap = new HashMap<>();
+    protected HashMap<Integer, TaskObject> taskMap = new HashMap<>();
 
     //печать по типу
     public void printAllTasks() {
