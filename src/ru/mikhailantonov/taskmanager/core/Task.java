@@ -69,7 +69,7 @@ class Task {
             System.out.println("Такой задачи нет");
         }
     }
-
+    //Удалить по ID
     public String deleteOneTask(int id) {
         taskMap.remove(id);
         return "Задача ID: " + id + " удалена.";

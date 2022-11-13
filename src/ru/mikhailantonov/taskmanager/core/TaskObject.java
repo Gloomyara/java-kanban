@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class TaskObject {
 
     HashMap<Integer, TaskObject> subTaskMap;
-    private boolean isEpic;
+    private final boolean isEpic;
     private Integer taskId;
     private Integer epicTaskId;
     private String taskName;

@@ -7,8 +7,6 @@ public class TaskManager {
     Task task = new Task();
     EpicTask epicTask = new EpicTask();
 
-    //удаление всех эпиков и подзадач
-
     //получить задачу по ID
     public TaskObject getObjectById(int taskId) {
 
@@ -84,6 +82,7 @@ public class TaskManager {
         return epicTask.deleteOneTask(id);
     }
 
+    //печать всех задач
     public void printAllTasks() {
         System.out.println(task.taskMap);
         System.out.println(epicTask.taskMap);

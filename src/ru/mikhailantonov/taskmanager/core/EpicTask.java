@@ -8,6 +8,7 @@ class EpicTask extends Task {
 
     HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
 
+    //создать эпик
     @Override
     public void createNewTask(TaskObject epicObject) {
 
@@ -24,6 +25,7 @@ class EpicTask extends Task {
         }
     }
 
+    //обновить эпик
     @Override
     public void updateTask(TaskObject task) {
 
@@ -50,6 +52,7 @@ class EpicTask extends Task {
         }
     }
 
+    //создать подзадачу
     public void createNewSubTask(TaskObject object) {
         int taskId = object.getTaskId();
         int epicTaskId = object.getEpicTaskId();
@@ -65,6 +68,7 @@ class EpicTask extends Task {
         epicObject.setTaskStatus(epicStatusType(epicTaskId));
     }
 
+    //обновить подзадачу
     public void updateSubTask(TaskObject task) {
         int epicTaskId = task.getEpicTaskId();
         int taskId = task.getTaskId();
@@ -107,7 +111,7 @@ class EpicTask extends Task {
         }
     }
 
-    //удаление по ИД
+    //удалить по ID
     @Override
     public String deleteOneTask(int id) {
 
@@ -124,7 +128,7 @@ class EpicTask extends Task {
         return "Задачи под таким ID нет.";
     }
 
-    //Получить по ID
+    //получить по ID
     @Override
     public TaskObject getOneTask(int taskId) {
         if (taskMap.containsKey(taskId)) {
@@ -137,6 +141,22 @@ class EpicTask extends Task {
         return null;
     }
 
+    //удалить все подзадачи
+    public void deleteAllSubTasks() {
+
+        if (!taskMap.isEmpty()) {
+            for (TaskObject epicObject : taskMap.values()) {
+                if (!epicObject.subTaskMap.isEmpty()) {
+                    epicObject.subTaskMap.clear();
+                    System.out.println("Подзадачи эпика: " + epicObject.getTaskName() + " удалены");
+                } else {
+                    System.out.println("В эпике: " + epicObject.getTaskName() + " нет подзадач");
+                }
+            }
+        } else {
+            System.out.println("Ошибка! нет эпик задач");
+        }
+    }
     // ниже методы для статуса эпика оба варианта рабочие
     /*public StatusType epicStatusType(int epicTaskId) {
 
@@ -164,7 +184,7 @@ class EpicTask extends Task {
         }
         return status;
     }*/
-//как лучше?
+    //как лучше?
     public StatusType epicStatusType(int taskId) {
 
         StatusType status = null;
