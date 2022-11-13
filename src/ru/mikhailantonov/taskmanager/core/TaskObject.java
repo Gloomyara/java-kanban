@@ -1,9 +1,11 @@
 package ru.mikhailantonov.taskmanager.core;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class TaskObject {
 
+    HashMap<Integer, TaskObject> subTaskMap;
     private boolean isEpic;
     private Integer taskId;
     private Integer epicTaskId;
@@ -91,7 +93,13 @@ public class TaskObject {
         this.epicTaskId = epicTaskId;
     }
 
+    @Override
     public String toString() {
-        return "{ Номер задачи: " + taskId + " Эпик?: " + isEpic + " Название задачи: " + taskName + " " + taskStatus + "}";
+        String result = "{ Номер задачи: " + taskId + " Эпик?: " + isEpic
+                + " Название задачи: " + taskName + " " + taskStatus + "}";
+        if (subTaskMap != null) {
+            result = result + "Подзадачи: " + subTaskMap;
+        }
+        return result;
     }
 }

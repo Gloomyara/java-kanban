@@ -25,9 +25,7 @@ public class Main {
             TaskObject object = taskManager.getObjectById(i);
             System.out.println(object);
         }
-        System.out.println(taskManager.task.taskMap);
-        System.out.println(taskManager.epicTask.taskMap);
-        System.out.println(taskManager.subTask.taskMap);
+        taskManager.printAllTasks();
 
         for (int i = 1; i < 8; i++) {
             TaskObject object = taskManager.getObjectById(i);
@@ -36,9 +34,7 @@ public class Main {
             }
             taskManager.manageTask(object);
         }
-        System.out.println(taskManager.task.taskMap);
-        System.out.println(taskManager.epicTask.taskMap);
-        System.out.println(taskManager.subTask.taskMap);
+        taskManager.printAllTasks();
 
         for (int i = 1; i < 8; i++) {
             TaskObject object = taskManager.getObjectById(i);
@@ -47,15 +43,14 @@ public class Main {
             }
             taskManager.manageTask(object);
         }
-        System.out.println(taskManager.task.taskMap);
-        System.out.println(taskManager.subTask.taskMap);
-        System.out.println(taskManager.epicTask.taskMap);
+
+        taskManager.printAllTasks();
+
         taskManager.printOneEpicSubTasks(3);
 
         System.out.println(taskManager.deleteOneTask(1));
         System.out.println(taskManager.deleteOneTask(6));
-        System.out.println(taskManager.task.taskMap);
-        System.out.println(taskManager.subTask.taskMap);
-        System.out.println(taskManager.epicTask.taskMap);
+
+        taskManager.printAllTasks();
     }
 }

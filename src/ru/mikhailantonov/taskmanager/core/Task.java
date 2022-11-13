@@ -30,13 +30,9 @@ class Task {
         }
     }
 
+    //Получить по ID
     public TaskObject getOneTask(int taskId) {
-        if (taskMap.containsKey(taskId)) {
-
-            return taskMap.get(taskId);
-        }
-        System.out.println("Задачи под таким ID нет.");
-        return null;
+        return taskMap.get(taskId);
     }
 
     //создать задачу
@@ -44,6 +40,7 @@ class Task {
         int taskId = task.getTaskId();
         task.setTaskCreateDate(Calendar.getInstance());
         task.setTaskUpdateDate(Calendar.getInstance());
+
         if (!taskMap.containsKey(taskId)) {
             taskMap.put(taskId, task);
         } else {
@@ -57,7 +54,6 @@ class Task {
         int taskId = task.getTaskId();
 
         if (taskMap.containsKey(taskId)) {
-
             TaskObject oneTask = taskMap.get(taskId);
             oneTask.setTaskStatus(task.getTaskStatus());
             oneTask.setTaskName(task.getTaskName());
@@ -65,15 +61,17 @@ class Task {
             oneTask.setTaskStatus(task.getTaskStatus());
 
             if (oneTask.getTaskStatus() == StatusType.DONE) {
-
                 oneTask.setCloseDate(Calendar.getInstance());
             } else {
-
                 oneTask.setTaskUpdateDate(Calendar.getInstance());
             }
-
         } else {
             System.out.println("Такой задачи нет");
         }
+    }
+
+    public String deleteOneTask(int id) {
+        taskMap.remove(id);
+        return "Задача ID: " + id + " удалена.";
     }
 }
