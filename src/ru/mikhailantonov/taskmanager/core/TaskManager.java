@@ -161,7 +161,7 @@ public class TaskManager {
             return "Задача ID: " + id + " удалена.";
         } else if (subTask.taskMap.containsKey(id)) {
             subTask.taskMap.remove(id);
-            return "Задача ID: " + id + " удалена.";
+            return "Подзадача ID: " + id + " удалена.";
         } else if (epicTask.taskMap.containsKey(id)) {
             if (epicSubTaskIdMap.containsKey(id)) {
                 subTaskIdList = epicSubTaskIdMap.get(id);

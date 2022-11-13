@@ -61,7 +61,6 @@ class Task {
             oneTask.setTaskName(task.getTaskName());
             oneTask.setTaskDescription(task.getTaskDescription());
             oneTask.setTaskStatus(task.getTaskStatus());
-            //oneTask.setTaskAppoint();
 
             if (oneTask.getTaskStatus() == StatusType.DONE) {
 
