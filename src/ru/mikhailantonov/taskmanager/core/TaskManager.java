@@ -7,28 +7,65 @@ import java.util.HashMap;
 
 public class TaskManager {
 
-    int id = 0; //было нужно для тестов
+    int id = 1; //было нужно для тестов
 
     Task task = new Task();
     EpicTask epicTask = new EpicTask();
     SubTask subTask = new SubTask();
-    private ArrayList<Integer> subTaskId = new ArrayList<>();
+    private ArrayList<Integer> subTaskId;
     private HashMap<Integer, ArrayList<Integer>> epicSubTaskIdMap = new HashMap<>();
 
+    //получить задачу по ID
+    public TaskObject getObjectById(int taskId) {
 
+        if (task.taskMap.containsKey(taskId)) {
+            return task.taskMap.get(taskId);
+        } else if (epicTask.taskMap.containsKey(taskId)) {
+            return epicTask.taskMap.get(taskId);
+        } else {
+            return subTask.taskMap.get(taskId);
+        }
+    }
+
+    //обработка входящей задачи
     public void manageTask(TaskObject object) {
+        int newId = id;
+        subTaskId = new ArrayList<>();
 
-        Integer taskId = object.getTaskId();
         Integer epicTaskId = object.getEpicTaskId();
-        //условие для создания подзадачи
-        if ((epicTaskId != null) && (taskId != null)) {
+        if (object.getTaskId() == null) {
+            object.setTaskId(newId);
+        }
+        int taskId = object.getTaskId();
 
-            if (!subTask.taskMap.containsKey(taskId)) {
-
+        //условие для создания эпика
+        if (object.isEpic()) {
+            if (!epicTask.taskMap.containsKey(taskId)) {
+                object.setTaskId(taskId);
+                object.setTaskStatus(epicStatusType(taskId));
                 object.setTaskCreateDate(Calendar.getInstance());
-                id = subTask.createNewTask(object);//возвращает ид+1
-
-                subTaskId = epicSubTaskIdMap.get(epicTaskId);
+                object.setTaskUpdateDate(Calendar.getInstance());
+                epicTask.createNewTask(object);
+                newId = id + 1;
+                epicSubTaskIdMap.put(taskId, subTaskId);
+            } else {
+                object.setTaskStatus(epicStatusType(taskId));
+                if (object.getTaskStatus().equals(StatusType.DONE)) {
+                    object.setCloseDate(Calendar.getInstance());
+                } else {
+                    object.setTaskUpdateDate(Calendar.getInstance());
+                }
+                epicTask.updateTask(object);
+            }
+            //условие для создания подзадачи
+        } else if (epicTaskId != null) {
+            if (!subTask.taskMap.containsKey(taskId)) {
+                object.setTaskId(taskId);
+                object.setTaskCreateDate(Calendar.getInstance());
+                object.setTaskUpdateDate(Calendar.getInstance());
+                subTask.createNewTask(object);
+                newId = id + 1;
+                if (epicSubTaskIdMap.get(epicTaskId) != null) subTaskId = epicSubTaskIdMap.get(epicTaskId);
                 subTaskId.add(taskId);
                 epicSubTaskIdMap.put(epicTaskId, subTaskId);
 
@@ -38,33 +75,18 @@ public class TaskManager {
                 } else {
                     object.setTaskUpdateDate(Calendar.getInstance());
                 }
+                subTask.updateTask(object);
                 TaskObject epicObject = epicTask.taskMap.get(epicTaskId);
                 epicObject.setTaskStatus(epicStatusType(epicTaskId));
-                subTask.updateTask(object);
             }
-        //условие для создания эпика
-        } else if (epicTaskId != null) {
-            if (!epicTask.taskMap.containsKey(epicTaskId)) {
-                object.setTaskStatus(epicStatusType(epicTaskId));
-                object.setTaskCreateDate(Calendar.getInstance());
-
-                id = epicTask.createNewTask(object);//возвращает ид+1
-                epicSubTaskIdMap.put(epicTaskId, subTaskId);
-            } else {
-                object.setTaskStatus(epicStatusType(epicTaskId));
-                if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    object.setCloseDate(Calendar.getInstance());
-                } else  {
-                    object.setTaskUpdateDate(Calendar.getInstance());
-                }
-                epicTask.updateTask(object);
-            }
-        //условие для создания просто задачи
-        } else if(taskId != null) {
+            //условие для создания просто задачи
+        } else {
 
             if (!task.taskMap.containsKey(taskId)) {
                 object.setTaskCreateDate(Calendar.getInstance());
-                id = task.createNewTask(object);//возвращает ид+1
+                object.setTaskUpdateDate(Calendar.getInstance());
+                task.createNewTask(object);
+                newId = id + 1;
             } else {
 
                 if (object.getTaskStatus().equals(StatusType.DONE)) {
@@ -74,45 +96,48 @@ public class TaskManager {
                 }
                 task.updateTask(object);
             }
-        } else {
-            System.out.println("Ошибка! задаче не присвоен ID");
         }
+        id = newId;
     }
+
     //метод для статуса эпика
     public StatusType epicStatusType(int epicTaskId) {
-        int counterNew = 0;
-        int counterDone = 0;
-        if (epicTask.taskMap.containsKey(epicTaskId) && epicSubTaskIdMap.containsKey(epicTaskId)) {
-            if (epicSubTaskIdMap.get(epicTaskId) == null) return StatusType.NEW;
+
+        ArrayList<Integer> check1 = new ArrayList<>();
+        ArrayList<Integer> check2 = new ArrayList<>();
+        StatusType status;
+        if (epicSubTaskIdMap.get(epicTaskId) == null) {
+            return StatusType.NEW;
+        } else {
             subTaskId = epicSubTaskIdMap.get(epicTaskId);
-            for (int taskId : subTaskId) {
-                TaskObject object = subTask.taskMap.get(taskId);
-                if ((object.getTaskStatus() == null) || (object.getTaskStatus().equals(StatusType.NEW))) {
-                    counterNew++;
+            for (int i : subTaskId) {
+                TaskObject object = subTask.taskMap.get(i);
+                if (object.getTaskStatus().equals(StatusType.NEW) || object.getTaskStatus() == null) {
+                    check1.add(i);
                 } else if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    counterDone++;
+                    check2.add(i);
                 }
             }
-            if (counterNew == subTask.taskMap.size()) {
-                return StatusType.NEW;
-            } else if (counterDone == subTask.taskMap.size()) {
-                return StatusType.DONE;
+
+            if (check1.size() == subTaskId.size()) {
+                status = StatusType.NEW;
+            } else if (check2.size() == subTaskId.size()) {
+                status = StatusType.DONE;
+            } else {
+                status = StatusType.IN_PROGRESS;
             }
-            return StatusType.IN_PROGRESS;
-        } else {
-            System.out.println("Ошибка! эпик задача не найдена");
-            return null;
         }
+        return status;
     }
 
     //метод для печати всех подзадач 1 эпика
-    void printOneEpicSubTasks (int epicTaskId) {
+    void printOneEpicSubTasks(int epicTaskId) {
         if (epicTask.taskMap.containsKey(epicTaskId) && epicSubTaskIdMap.containsKey(epicTaskId)) {
             subTaskId = epicSubTaskIdMap.get(epicTaskId);
             TaskObject epicObject = epicTask.taskMap.get(epicTaskId);
             System.out.println("Подзадачи эпика " + epicObject.getTaskName() + ":");
             for (int taskId : subTaskId) {
-                if (subTask.taskMap.containsKey(taskId)){
+                if (subTask.taskMap.containsKey(taskId)) {
                     TaskObject object = subTask.taskMap.get(taskId);
                     System.out.println(object.getTaskName());
                 }

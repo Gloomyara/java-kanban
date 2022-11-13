@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 public class TaskObject {
 
+    private boolean isEpic;
     private Integer taskId;
     private Integer epicTaskId;
     private String taskName;
@@ -13,6 +14,17 @@ public class TaskObject {
     private Calendar taskUpdateDate;
     private Calendar taskCloseDate = null;
 
+    TaskObject(Integer epicTaskId, boolean isEpic, String taskName, String taskDescription, StatusType taskStatus) {
+        this.isEpic = isEpic;
+        this.epicTaskId = epicTaskId;
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
+    }
+
+    public boolean isEpic() {
+        return isEpic;
+    }
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
@@ -80,7 +92,6 @@ public class TaskObject {
     }
 
     public String toString() {
-        return "Номер задачи: " + taskId + " Название задачи: " + taskName + " Create date:" +
-                taskCreateDate.getTime() + " Update date:" + taskUpdateDate.getTime();
+        return "{ Номер задачи: " + taskId + " Эпик?: " + isEpic + " Название задачи: " + taskName + " " + taskStatus + "}";
     }
 }
