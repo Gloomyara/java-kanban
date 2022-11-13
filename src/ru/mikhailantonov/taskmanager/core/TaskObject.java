@@ -24,7 +24,7 @@ public class TaskObject {
         this.taskStatus = taskStatus;
     }
 
-    public boolean isEpic() {
+    public Boolean isEpic() {
         return isEpic;
     }
 

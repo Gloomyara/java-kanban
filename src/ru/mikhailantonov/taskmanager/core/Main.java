@@ -44,7 +44,7 @@ public class Main {
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
             TaskObject object = taskManager.getObjectById(i);
-            if (!object.isEpic()) {
+            if ((object.isEpic()!=null)&&!object.isEpic()) {
                 object.setTaskStatus(StatusType.IN_PROGRESS);
             }
             taskManager.manageTask(object);

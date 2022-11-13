@@ -86,5 +86,8 @@ public class TaskManager {
     public void printAllTasks() {
         System.out.println(task.taskMap);
         System.out.println(epicTask.taskMap);
+        /*task.printAllTasks();
+        epicTask.printAllTasks();
+        epicTask.printAllSubTasks();*/
     }
 }

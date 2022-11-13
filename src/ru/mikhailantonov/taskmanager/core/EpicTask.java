@@ -102,8 +102,10 @@ class EpicTask extends Task {
         if (!taskMap.isEmpty()) {
             for (TaskObject epicObject : taskMap.values()) {
                 System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
-                for (TaskObject subObject : epicObject.subTaskMap.values()) {
-                    System.out.println(subObject.getTaskName());
+                if (epicObject.subTaskMap!=null) {
+                    for (TaskObject subObject : epicObject.subTaskMap.values()) {
+                        System.out.println(subObject.getTaskName());
+                    }
                 }
             }
         } else {
