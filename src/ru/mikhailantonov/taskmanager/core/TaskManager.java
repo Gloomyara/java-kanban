@@ -50,8 +50,8 @@ public class TaskManager {
                 object.setTaskId(taskId);
                 object.setTaskStatus(epicStatusType(taskId));
                 epicTask.createNewTask(object);
-                newId = id + 1;
                 epicSubTaskIdMap.put(taskId, subTaskIdList);
+                newId = id + 1;
             } else {
                 epicTask.updateTask(object);
             }
@@ -60,10 +60,11 @@ public class TaskManager {
             if (!subTask.taskMap.containsKey(taskId)) {
                 object.setTaskId(taskId);
                 subTask.createNewTask(object);
-                newId = id + 1;
+
                 if (epicSubTaskIdMap.get(epicTaskId) != null) subTaskIdList = epicSubTaskIdMap.get(epicTaskId);
                 subTaskIdList.add(taskId);
                 epicSubTaskIdMap.put(epicTaskId, subTaskIdList);
+                newId = id + 1;
 
             } else {
                 subTask.updateTask(object);
@@ -72,7 +73,6 @@ public class TaskManager {
             }
             //условие для создания просто задачи
         } else {
-
             if (!task.taskMap.containsKey(taskId)) {
                 task.createNewTask(object);
                 newId = id + 1;
