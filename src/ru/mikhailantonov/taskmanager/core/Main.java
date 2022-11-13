@@ -51,5 +51,11 @@ public class Main {
         System.out.println(taskManager.subTask.taskMap);
         System.out.println(taskManager.epicTask.taskMap);
         taskManager.printOneEpicSubTasks(3);
+
+        System.out.println(taskManager.deleteOneTask(1));
+        System.out.println(taskManager.deleteOneTask(6));
+        System.out.println(taskManager.task.taskMap);
+        System.out.println(taskManager.subTask.taskMap);
+        System.out.println(taskManager.epicTask.taskMap);
     }
 }

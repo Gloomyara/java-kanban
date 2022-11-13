@@ -75,14 +75,4 @@ class Task {
             System.out.println("Такой задачи нет");
         }
     }
-
-    //удалить по ID
-    public String deleteOneTask(int id) {
-
-        if (taskMap.containsKey(id)) {
-            taskMap.remove(id);
-            return "Задача удалена.";
-        }
-        return "Задачи под таким ID нет.";
-    }
 }

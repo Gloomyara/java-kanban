@@ -15,6 +15,12 @@ public class TaskManager {
     private ArrayList<Integer> subTaskIdList;
     private HashMap<Integer, ArrayList<Integer>> epicSubTaskIdMap = new HashMap<>();
 
+    //удаление всех эпиков и подзадач
+    public void DeleteAllEpicAndSub() {
+        subTask.deleteAllTasks();
+        epicTask.deleteAllTasks();
+    }
+
     //получить задачу по ID
     public TaskObject getObjectById(int taskId) {
 
@@ -145,5 +151,36 @@ public class TaskManager {
         } else {
             System.out.println("Ошибка! эпик задача не найдена");
         }
+    }
+
+    //удалить по ID
+    public String deleteOneTask(int id) {
+
+        if (task.taskMap.containsKey(id)) {
+            task.taskMap.remove(id);
+            return "Задача ID: " + id + " удалена.";
+        } else if (subTask.taskMap.containsKey(id)) {
+            subTask.taskMap.remove(id);
+            return "Задача ID: " + id + " удалена.";
+        } else if (epicTask.taskMap.containsKey(id)) {
+            if (epicSubTaskIdMap.containsKey(id)) {
+                subTaskIdList = epicSubTaskIdMap.get(id);
+                System.out.println("Эпик ID:" + id);
+                System.out.print("Подзадачи - ");
+                for (int i : subTaskIdList) {
+                    subTask.taskMap.remove(id);
+                    System.out.print("ID: " + i + ".");
+                }
+                System.out.println(" Удалены");
+
+                epicSubTaskIdMap.remove(id);
+
+            } else {
+                return "Удаление подзадач эпика c ID:" + id + " не удалось";
+            }
+            epicTask.taskMap.remove(id);
+            return "Эпик задача удалена";
+        }
+        return "Задачи под таким ID нет.";
     }
 }
