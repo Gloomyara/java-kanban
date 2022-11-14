@@ -3,76 +3,66 @@ package ru.mikhailantonov.taskmanager.core;
 public class Main {
 
     //Доброго времени суток, уважаемый Артем!
-    //Не знаю как описать это ДЗ, с 1й стороны ради удовлетворения ТЗ приходиться делать
-    //какие-то костыльные и бесполезные методы, с другой пытаешься сделать что-то нормальное...
-
-    //Эта версия уже 3, изначально отправил 2, но успел переделать до ее проверки
-    //В 3 версии получилось нечто среднее между 1 и 2, в процессе создания 3 чуть было не начал делать уже по сути 4
-    //На данный момент шаблон TaskObject включает в себя все поля для удобства нашего костыльного теста в Main
-    //Идея 4 версии была в 2х доп классах EpicTaskObject и SubTaskObject, дабы вынести уникальные для них поля,
-    //но очень быстро наткнулся на то, что везде все надо будет переделывать и особенно в Main.
-    //В нужном ключе мыслю по поводу 4 версии?
-    //Так что доделал 3 версию, дабы успеть обновить до ревью
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
         TaskManager taskManager = new TaskManager();
         //создать 7 задач
-        TaskObject taskObject1 = new TaskObject(null, false, "Задача1", "adsf", StatusType.NEW);
-        TaskObject taskObject2 = new TaskObject(null, false, "Задача2", "fdsa", StatusType.NEW);
-        TaskObject taskObject3 = new TaskObject(null, true, "ЭпикЗадача1", "fddadsf", null);
-        TaskObject taskObject4 = new TaskObject(3, false, "ПодЗадача1", "asdfsa", StatusType.NEW);
-        TaskObject taskObject5 = new TaskObject(3, false, "ПодЗадача2", "fdfasdf", StatusType.NEW);
-        TaskObject taskObject6 = new TaskObject(null, true, "ЭпикЗадача2", "fsgnbdfg", null);
-        TaskObject taskObject7 = new TaskObject(6, false, "ПодЗадача1", "asdfsa", StatusType.NEW);
+        Task taskObject1 = new Task("Задача1", "adsf", StatusType.NEW);
+        Task taskObject2 = new Task("Задача2", "fdsa", StatusType.NEW);
+        Task taskObject3 = new EpicTask("ЭпикЗадача1", "fddadsf");
+        Task taskObject4 = new SubTask(3, "ПодЗадача1", "asdfsa", StatusType.NEW);
+        Task taskObject5 = new SubTask(3, "ПодЗадача2", "fdfasdf", StatusType.NEW);
+        Task taskObject6 = new EpicTask("ЭпикЗадача2", "fsgnbdfg");
+        Task taskObject7 = new SubTask(6, "ПодЗадача1", "asdfsa", StatusType.NEW);
         //распределить по типу
-        taskManager.manageTask(taskObject1);
-        taskManager.manageTask(taskObject2);
-        taskManager.manageTask(taskObject3);
-        taskManager.manageTask(taskObject4);
-        taskManager.manageTask(taskObject5);
-        taskManager.manageTask(taskObject6);
-        taskManager.manageTask(taskObject7);
+        taskManager.manageObject(taskObject1);
+        taskManager.manageObject(taskObject2);
+        taskManager.manageObject(taskObject3);
+        taskManager.manageObject(taskObject4);
+        taskManager.manageObject(taskObject5);
+        taskManager.manageObject(taskObject6);
+        taskManager.manageObject(taskObject7);
         //печать всех задач через toString
         for (int i = 1; i < 8; i++) {
-            TaskObject object = taskManager.getObjectById(i);
+            Task object = taskManager.getObjectById(i);
             System.out.println(object);
         }
         //печать всех задач
-        taskManager.printAllTasks();
+        taskManager.printAllTypesTasks();
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
-            TaskObject object = taskManager.getObjectById(i);
-            if ((object.isEpic()!=null)&&!object.isEpic()) {
+            Task object = taskManager.getObjectById(i);
+            if (!(object instanceof EpicTask)) {
                 object.setTaskStatus(StatusType.IN_PROGRESS);
             }
-            taskManager.manageTask(object);
+            taskManager.manageObject(object);
         }
 
         //печать всех задач
-        taskManager.printAllTasks();
+        taskManager.printAllTypesTasks();
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
-            TaskObject object = taskManager.getObjectById(i);
-            if (!object.isEpic()) {
+            Task object = taskManager.getObjectById(i);
+            if (!(object instanceof EpicTask)) {
                 object.setTaskStatus(StatusType.DONE);
             }
-            taskManager.manageTask(object);
+            taskManager.manageObject(object);
         }
 
         //печать всех задач
-        taskManager.printAllTasks();
+        taskManager.printAllTypesTasks();
 
         //печать задач 1 эпика
         taskManager.printOneEpicSubTasks(3);
 
         //удаление 2х задач
-        System.out.println(taskManager.deleteOneTask(1));
-        System.out.println(taskManager.deleteOneTask(6));
+        taskManager.deleteOneTask(1);
+        taskManager.deleteOneTask(6);
 
         //печать всех задач
-        taskManager.printAllTasks();
+        taskManager.printAllTypesTasks();
     }
 }

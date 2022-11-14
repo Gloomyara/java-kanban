@@ -4,230 +4,51 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-class EpicTask extends Task {
+public class EpicTask extends Task {
 
-    private HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
+    HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
-    //создать эпик
-    @Override
-    public void createNewTask(TaskObject epicObject) {
+    public EpicTask(String taskName, String taskDescription) {
 
-        int taskId = epicObject.getTaskId();
-        epicObject.setTaskCreateDate(Calendar.getInstance());
-        epicObject.setTaskUpdateDate(Calendar.getInstance());
-        epicObject.setTaskStatus(epicStatusType(taskId));
-        epicObject.subTaskMap = new HashMap<>();
-
-        if (!taskMap.containsKey(taskId)) {
-            taskMap.put(taskId, epicObject);
-        } else {
-            System.out.println("Ошибка! Задача с таким ID уже есть");
-        }
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
     }
 
-    //обновить эпик
-    @Override
-    public void updateTask(TaskObject task) {
-
-        int taskId = task.getTaskId();
-
-        if (taskMap.containsKey(taskId)) {
-
-            TaskObject epicObject = taskMap.get(taskId);
-            epicObject.setTaskStatus(task.getTaskStatus());
-            epicObject.setTaskName(task.getTaskName());
-            epicObject.setTaskDescription(task.getTaskDescription());
-            epicObject.setTaskStatus(epicStatusType(taskId));
-
-            if (epicObject.getTaskStatus() == StatusType.DONE) {
-
-                epicObject.setCloseDate(Calendar.getInstance());
-            } else {
-
-                epicObject.setTaskUpdateDate(Calendar.getInstance());
-            }
-
-        } else {
-            System.out.println("Такой задачи нет");
-        }
-    }
-
-    //создать подзадачу
-    public void createNewSubTask(TaskObject object) {
-        int taskId = object.getTaskId();
-        int epicTaskId = object.getEpicTaskId();
-        TaskObject epicObject = taskMap.get(epicTaskId);
-        object.setTaskCreateDate(Calendar.getInstance());
-        object.setTaskUpdateDate(Calendar.getInstance());
-        if (!epicObject.subTaskMap.containsKey(taskId)) {
-            epicSubTaskIdMap.put(taskId, epicTaskId);
-            epicObject.subTaskMap.put(taskId, object);
-        } else {
-            System.out.println("Ошибка! Задача с таким ID уже есть");
-        }
-        epicObject.setTaskStatus(epicStatusType(epicTaskId));
-    }
-
-    //обновить подзадачу
-    public void updateSubTask(TaskObject task) {
-        int epicTaskId = task.getEpicTaskId();
-        int taskId = task.getTaskId();
-
-        if (taskMap.containsKey(epicTaskId)) {
-
-            TaskObject epicObject = taskMap.get(epicTaskId);
-            TaskObject object = epicObject.subTaskMap.get(taskId);
-            object.setTaskStatus(task.getTaskStatus());
-            object.setTaskName(task.getTaskName());
-            object.setTaskDescription(task.getTaskDescription());
-            object.setTaskStatus(task.getTaskStatus());
-
-            if (object.getTaskStatus() == StatusType.DONE) {
-
-                object.setCloseDate(Calendar.getInstance());
-
-            } else {
-
-                object.setTaskUpdateDate(Calendar.getInstance());
-            }
-            epicObject.setTaskStatus(epicStatusType(epicTaskId));
-        } else {
-            System.out.println("Такой задачи нет");
-        }
-    }
-
-    //печать подзадач
-    public void printAllSubTasks() {
-
-        if (!taskMap.isEmpty()) {
-            for (TaskObject epicObject : taskMap.values()) {
-                System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
-                if (epicObject.subTaskMap!=null) {
-                    for (TaskObject subObject : epicObject.subTaskMap.values()) {
-                        System.out.println(subObject.getTaskName());
-                    }
-                }
-            }
-        } else {
-            System.out.println("Ошибка! нет задач");
-        }
-    }
-
-    //удалить по ID
-    @Override
-    public String deleteOneTask(int id) {
-
-        if (epicSubTaskIdMap.containsKey(id)) {
-            int epicTaskId = epicSubTaskIdMap.get(id);
-            TaskObject epicObject = taskMap.get(epicTaskId);
-            epicObject.subTaskMap.remove(id);
-            return "Подзадача ID: " + id + " удалена.";
-
-        } else if (taskMap.containsKey(id)) {
-            taskMap.remove(id);
-            return "Эпик задача ID: " + id + " и все ее подзадачи удалены.";
-        }
-        return "Задачи под таким ID нет.";
-    }
-
-    //получить по ID
-    @Override
-    public TaskObject getOneTask(int taskId) {
-        if (taskMap.containsKey(taskId)) {
-            return taskMap.get(taskId);
-        } else if (epicSubTaskIdMap.containsKey(taskId)) {
-            int epicTaskId = epicSubTaskIdMap.get(taskId);
-            TaskObject epicObject = taskMap.get(epicTaskId);
-            return epicObject.subTaskMap.get(taskId);
-        }
-        return null;
-    }
-
-    //удалить все подзадачи
-    public void deleteAllSubTasks() {
-
-        if (!taskMap.isEmpty()) {
-            for (TaskObject epicObject : taskMap.values()) {
-                if (!epicObject.subTaskMap.isEmpty()) {
-                    epicObject.subTaskMap.clear();
-                    System.out.println("Подзадачи эпика: " + epicObject.getTaskName() + " удалены");
-                } else {
-                    System.out.println("В эпике: " + epicObject.getTaskName() + " нет подзадач");
-                }
-            }
-        } else {
-            System.out.println("Ошибка! нет эпик задач");
-        }
-    }
-    // ниже методы для статуса эпика оба варианта рабочие
-    /*public StatusType epicStatusType(int epicTaskId) {
-
-        ArrayList<Integer> check1 = new ArrayList<>();
-        ArrayList<Integer> check2 = new ArrayList<>();
-        StatusType status = null;
-        if (taskMap.containsKey(epicTaskId)) {
-            TaskObject epicObject = taskMap.get(epicTaskId);
-
-            for (int i : epicObject.subTaskMap.keySet()) {
-                TaskObject object = epicObject.subTaskMap.get(i);
-                if (object.getTaskStatus().equals(StatusType.NEW) || object.getTaskStatus() == null) {
-                    check1.add(i);
-                } else if (object.getTaskStatus().equals(StatusType.DONE)) {
-                    check2.add(i);
-                }
-            }
-            if (check1.size() == epicObject.subTaskMap.size()) {
-                status = StatusType.NEW;
-            } else if (check2.size() == epicObject.subTaskMap.size()) {
-                status = StatusType.DONE;
-            } else {
-                status = StatusType.IN_PROGRESS;
-            }
-        }
-        return status;
-    }*/
-    //как лучше?
-    public StatusType epicStatusType(int taskId) {
-
-        StatusType status = null;
-        if (!taskMap.containsKey(taskId)) {
-            if (epicSubTaskIdMap.containsKey(taskId)) {
-                int epicTaskId = epicSubTaskIdMap.get(taskId);
-                status = epicStatus(epicTaskId);
-            }
-        } else {
-            status = epicStatus(taskId);
-        }
-        return status;
-    }
-
-    public StatusType epicStatus(int taskId) {
+    public StatusType epicStatusType() {
         ArrayList<Integer> check1 = new ArrayList<>();
         ArrayList<Integer> check2 = new ArrayList<>();
         StatusType status;
-        TaskObject epicTask = taskMap.get(taskId);
-        if (epicTask.subTaskMap.isEmpty()) {
+
+        if (subTaskMap.isEmpty()) {
             return StatusType.NEW;
         } else {
 
-            for (int i : epicTask.subTaskMap.keySet()) {
-                TaskObject object = epicTask.subTaskMap.get(i);
+            for (int i : subTaskMap.keySet()) {
+                SubTask object = subTaskMap.get(i);
                 if (object.getTaskStatus().equals(StatusType.NEW)) {
                     check1.add(i);
                 } else if (object.getTaskStatus().equals(StatusType.DONE)) {
                     check2.add(i);
                 }
             }
-            if (check1.size() == epicTask.subTaskMap.size()) {
+            if (check1.size() == subTaskMap.size()) {
                 status = StatusType.NEW;
-            } else if (check2.size() == epicTask.subTaskMap.size()) {
+            } else if (check2.size() == subTaskMap.size()) {
                 status = StatusType.DONE;
+                setCloseDate(Calendar.getInstance());
             } else {
                 status = StatusType.IN_PROGRESS;
             }
         }
         return status;
     }
+
+    @Override
+    public String toString() {
+        String result = "{ Номер задачи: " + taskId + " Название эпика: " + taskName + " " + taskStatus;
+        if (subTaskMap != null) {
+            result = result + "\n Подзадачи: " + subTaskMap;
+        }
+        return result + " }\n";
+    }
 }
-
-

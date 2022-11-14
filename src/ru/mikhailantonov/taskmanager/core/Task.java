@@ -1,77 +1,87 @@
 package ru.mikhailantonov.taskmanager.core;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
-class Task {
+public class Task {
+    protected Integer taskId;
+    protected String taskName;
+    protected StatusType taskStatus;
+    protected String taskDescription;
+    protected Calendar taskCreateDate;
+    protected Calendar taskUpdateDate;
+    protected Calendar taskCloseDate = null;
 
-    protected HashMap<Integer, TaskObject> taskMap = new HashMap<>();
+    Task(){
 
-    //печать по типу
-    public void printAllTasks() {
+    }
+    Task(String taskName, String taskDescription, StatusType taskStatus) {
 
-        if (!taskMap.isEmpty()) {
-            for (TaskObject oneTask : taskMap.values()) {
-                System.out.println(oneTask.getTaskName());
-            }
-        } else {
-            System.out.println("В списке нет задач");
-        }
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
     }
 
-    //удалить по типу
-    public void deleteAllTasks() {
-
-        if (!taskMap.isEmpty()) {
-            taskMap.clear();
-            System.out.println("все задачи удалены");
-        } else {
-            System.out.println("Нечего удалять");
-        }
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
-    //Получить по ID
-    public TaskObject getOneTask(int taskId) {
-        return taskMap.get(taskId);
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
     }
 
-    //создать задачу
-    public void createNewTask(TaskObject task) {
-        int taskId = task.getTaskId();
-        task.setTaskCreateDate(Calendar.getInstance());
-        task.setTaskUpdateDate(Calendar.getInstance());
-
-        if (!taskMap.containsKey(taskId)) {
-            taskMap.put(taskId, task);
-        } else {
-            System.out.println("Ошибка! Задача с таким ID уже есть");
-        }
+    public void setCloseDate(Calendar date) {
+        taskCloseDate = date;
     }
 
-    //обновить задачу
-    public void updateTask(TaskObject task) {
-
-        int taskId = task.getTaskId();
-
-        if (taskMap.containsKey(taskId)) {
-            TaskObject oneTask = taskMap.get(taskId);
-            oneTask.setTaskStatus(task.getTaskStatus());
-            oneTask.setTaskName(task.getTaskName());
-            oneTask.setTaskDescription(task.getTaskDescription());
-            oneTask.setTaskStatus(task.getTaskStatus());
-
-            if (oneTask.getTaskStatus() == StatusType.DONE) {
-                oneTask.setCloseDate(Calendar.getInstance());
-            } else {
-                oneTask.setTaskUpdateDate(Calendar.getInstance());
-            }
-        } else {
-            System.out.println("Такой задачи нет");
-        }
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
     }
-    //Удалить по ID
-    public String deleteOneTask(int id) {
-        taskMap.remove(id);
-        return "Задача ID: " + id + " удалена.";
+
+    public Integer getTaskId() {
+        return this.taskId;
+    }
+
+    public Calendar getTaskUpdateDate() {
+        return this.taskUpdateDate;
+    }
+
+    void setTaskUpdateDate(Calendar date) {
+        taskUpdateDate = date;
+    }
+
+    public Calendar getTaskCloseDate() {
+        if (taskCloseDate != null) return this.taskCloseDate;
+        return null;
+    }
+
+    public Calendar getTaskCreateDate() {
+        return this.taskCreateDate;
+    }
+
+    public void setTaskCreateDate(Calendar date) {
+        taskCreateDate = date;
+    }
+
+    public String getTaskName() {
+        return this.taskName;
+    }
+
+    public String getTaskDescription() {
+        return this.taskDescription;
+    }
+
+    public StatusType getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(StatusType statusType) {
+        this.taskStatus = statusType;
+    }
+
+
+
+    @Override
+    public String toString() {
+        return "{ Номер задачи: " + taskId + " Название задачи: " + taskName + " " + taskStatus + " }\n";
     }
 }
