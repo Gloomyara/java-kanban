@@ -45,10 +45,10 @@ public class EpicTask extends Task {
 
     @Override
     public String toString() {
-        String result = "{ Номер задачи: " + taskId + " Название эпика: " + taskName + " " + taskStatus;
+        String result = "{ID: " + taskId + " Эпик: " + taskName + " " + taskStatus;
         if (subTaskMap != null) {
-            result = result + "\n Подзадачи: " + subTaskMap;
+            result = result + "\n Подзадачи: " + subTaskMap.values();
         }
-        return result + " }\n";
+        return result + "}\n";
     }
 }

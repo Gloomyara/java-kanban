@@ -82,6 +82,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "{ Номер задачи: " + taskId + " Название задачи: " + taskName + " " + taskStatus + " }\n";
+        return "{ID: " + taskId + " Задача: " + taskName + " " + taskStatus + "}\n";
     }
 }
