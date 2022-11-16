@@ -1,5 +1,6 @@
 package ru.mikhailantonov.taskmanager.core;
 
+import ru.mikhailantonov.taskmanager.task.*;
 import java.util.Calendar;
 import java.util.HashMap;
 
@@ -122,7 +123,7 @@ public class TaskManager {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
             System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
             for (SubTask subObject : epicObject.getSubTaskMap().values()) {
-                System.out.println("Подзадача: " + subObject.taskName);
+                System.out.println("Подзадача: " + subObject.getTaskName());
             }
         } else {
             System.out.println("Ошибка! эпик задача не найдена");
@@ -176,7 +177,7 @@ public class TaskManager {
 
         if (!taskMap.isEmpty()) {
             for (Task object : taskMap.values()) {
-                System.out.println(object.taskName);
+                System.out.println(object.getTaskName());
             }
         } else {
             System.out.println("Ошибка! не найдено задач!");
@@ -188,7 +189,7 @@ public class TaskManager {
 
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
-                System.out.println(epicObject.taskName);
+                System.out.println(epicObject.getTaskName());
             }
         } else {
             System.out.println("Ошибка! не найдено эпиков'!");
@@ -200,10 +201,10 @@ public class TaskManager {
 
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
-                System.out.println("Подзадачи эпика: " + epicObject.taskName);
+                System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     for (SubTask subObject : epicObject.getSubTaskMap().values())
-                        System.out.println("Подазадача: " + subObject.taskName);
+                        System.out.println("Подазадача: " + subObject.getTaskName());
                 } else {
                     System.out.println("Нет подзадач");
                 }

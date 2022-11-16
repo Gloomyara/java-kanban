@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.core;
+package ru.mikhailantonov.taskmanager.task;
 
 public class SubTask extends Task {
     private int epicTaskId;

@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.core;
+package ru.mikhailantonov.taskmanager.task;
 
 import java.util.Calendar;
 
@@ -14,7 +14,7 @@ public class Task {
     Task(){
 
     }
-    Task(String taskName, String taskDescription, StatusType taskStatus) {
+    public Task(String taskName, String taskDescription, StatusType taskStatus) {
 
         this.taskName = taskName;
         this.taskDescription = taskDescription;
@@ -45,7 +45,7 @@ public class Task {
         return this.taskUpdateDate;
     }
 
-    void setTaskUpdateDate(Calendar date) {
+    public void setTaskUpdateDate(Calendar date) {
         taskUpdateDate = date;
     }
 
