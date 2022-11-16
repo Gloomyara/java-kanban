@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.core;
+package ru.mikhailantonov.taskmanager.task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
