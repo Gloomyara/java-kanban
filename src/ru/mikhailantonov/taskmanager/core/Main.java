@@ -58,9 +58,10 @@ public class Main {
         //печать задач 1 эпика
         taskManager.printOneEpicSubTasks(3);
 
-        //удаление 2х задач
+        //удаление 3х задач
         taskManager.deleteOneTask(1);
         taskManager.deleteOneTask(6);
+        taskManager.deleteOneTask(4);
 
         //печать всех задач
         taskManager.printAllTypesTasks();

@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class EpicTask extends Task {
 
-    HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
+    private HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
     public EpicTask(String taskName, String taskDescription) {
 
@@ -50,5 +50,9 @@ public class EpicTask extends Task {
             result = result + "\n Подзадачи: " + subTaskMap.values();
         }
         return result + "}\n";
+    }
+
+    public HashMap<Integer, SubTask> getSubTaskMap() {
+        return subTaskMap;
     }
 }

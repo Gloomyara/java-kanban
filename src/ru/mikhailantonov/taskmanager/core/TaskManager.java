@@ -65,17 +65,17 @@ public class TaskManager {
         } else {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
 
-            if (!epicObject.subTaskMap.containsKey(taskId)) {
+            if (!epicObject.getSubTaskMap().containsKey(taskId)) {
 
                 subObject.setTaskStatus(StatusType.NEW);
                 subObject.setTaskCreateDate(Calendar.getInstance());
                 subObject.setTaskUpdateDate(Calendar.getInstance());
-                epicObject.subTaskMap.put(taskId, subObject);
+                epicObject.getSubTaskMap().put(taskId, subObject);
                 epicSubTaskIdMap.put(taskId, epicTaskId);
                 id = id + 1;
             } else {
 
-                SubTask object = epicObject.subTaskMap.get(taskId);
+                SubTask object = epicObject.getSubTaskMap().get(taskId);
                 object.setTaskName(subObject.getTaskName());
                 object.setTaskDescription(subObject.getTaskDescription());
                 object.setTaskStatus(subObject.getTaskStatus());
@@ -121,8 +121,8 @@ public class TaskManager {
         if (epicTaskMap.containsKey(epicTaskId)) {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
             System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
-            for (SubTask subObject : epicObject.subTaskMap.values()) {
-                System.out.println(subObject.getTaskName());
+            for (SubTask subObject : epicObject.getSubTaskMap().values()) {
+                System.out.println("Подзадача: " + subObject.taskName);
             }
         } else {
             System.out.println("Ошибка! эпик задача не найдена");
@@ -138,8 +138,8 @@ public class TaskManager {
             return epicTaskMap.get(taskId);
         } else if (epicSubTaskIdMap.containsKey(taskId)) {
             int epicTaskId = epicSubTaskIdMap.get(taskId);
-            EpicTask epicTask = epicTaskMap.get(epicTaskId);
-            return epicTask.subTaskMap.get(taskId);
+            EpicTask epicObject = epicTaskMap.get(epicTaskId);
+            return epicObject.getSubTaskMap().get(taskId);
         }
         return null;
     }
@@ -157,7 +157,7 @@ public class TaskManager {
 
             int epicTaskId = epicSubTaskIdMap.get(taskId);
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
-            epicObject.subTaskMap.remove(taskId);
+            epicObject.getSubTaskMap().remove(taskId);
             epicSubTaskIdMap.remove(taskId);
             System.out.println("Подзадача эпика: " + epicTaskId + ", под номером: " + taskId + " удалена.");
         } else {
@@ -201,8 +201,8 @@ public class TaskManager {
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
                 System.out.println("Подзадачи эпика: " + epicObject.taskName);
-                if (!epicObject.subTaskMap.isEmpty()) {
-                    for (SubTask subObject : epicObject.subTaskMap.values())
+                if (!epicObject.getSubTaskMap().isEmpty()) {
+                    for (SubTask subObject : epicObject.getSubTaskMap().values())
                         System.out.println("Подазадача: " + subObject.taskName);
                 } else {
                     System.out.println("Нет подзадач");
@@ -241,8 +241,8 @@ public class TaskManager {
         if (!epicSubTaskIdMap.isEmpty()) {
             epicSubTaskIdMap.clear();
             for (EpicTask epicObject : epicTaskMap.values()) {
-                if (!epicObject.subTaskMap.isEmpty()) {
-                    epicObject.subTaskMap.clear();
+                if (!epicObject.getSubTaskMap().isEmpty()) {
+                    epicObject.getSubTaskMap().clear();
                     System.out.println("В эпике под номером: " + epicObject.getTaskId() + " все подзадачи удалены");
                 } else {
                     System.out.println("В эпике под номером: " + epicObject.getTaskId() + " Нечего удалять");
