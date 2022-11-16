@@ -1,11 +1,10 @@
-package ru.mikhailantonov.taskmanager.controllers;
+package ru.mikhailantonov.taskmanager.core;
 
 import ru.mikhailantonov.taskmanager.core.TaskManager;
 import ru.mikhailantonov.taskmanager.task.*;
 
 
 import ru.mikhailantonov.taskmanager.manager.Manager;
-import ru.mikhailantonov.taskmanager.task.*;
 
 public class Main {
 
