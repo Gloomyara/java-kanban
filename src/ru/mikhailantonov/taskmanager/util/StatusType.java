@@ -1,4 +1,6 @@
-package ru.mikhailantonov.taskmanager.task;
+package ru.mikhailantonov.taskmanager.util;
+
+/** Enum со статусами задач */
 
 public enum StatusType {
     //Перечисляем варианты состояний задачи и их названия

@@ -1,18 +1,28 @@
 package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
+import ru.mikhailantonov.taskmanager.util.StatusType;
+
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class Manager {
+/** Класс нашего самого 1ого менеджера, для обработки и хранения объектов задач */
 
+public class InMemoryTaskManager implements TaskManager {
+
+    HistoryManager historyManager = new InMemoryHistoryManager();
     int id = 1; //было нужно для тестов
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
     private HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
 
+    @Override
+    public String getHistory() {
+        return historyManager.getHistory();
+    }
 
     //обработка входящей задачи
+    @Override
     public void manageObject(Task object) {
 
         if (object.getTaskId() == null) {
@@ -31,6 +41,7 @@ public class Manager {
         }
     }
 
+    @Override
     public void manageEpicTask(EpicTask epicObject) {
 
         int taskId = epicObject.getTaskId();
@@ -57,6 +68,7 @@ public class Manager {
         }
     }
 
+    @Override
     public void manageSubTask(SubTask subObject) {
 
         int taskId = subObject.getTaskId();
@@ -91,6 +103,7 @@ public class Manager {
         }
     }
 
+    @Override
     public void manageTask(Task taskObject) {
 
         int taskId = taskObject.getTaskId();
@@ -118,6 +131,7 @@ public class Manager {
     }
 
     //метод для печати всех подзадач 1 эпика
+    @Override
     public void printOneEpicSubTasks(int epicTaskId) {
         if (epicTaskMap.containsKey(epicTaskId)) {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
@@ -131,48 +145,86 @@ public class Manager {
     }
 
     //получить задачу по ID
+    @Override
     public Task getObjectById(int taskId) {
 
         if (taskMap.containsKey(taskId)) {
-            return taskMap.get(taskId);
+            return getTask(taskId);
         } else if (epicTaskMap.containsKey(taskId)) {
-            return epicTaskMap.get(taskId);
+            return getEpicTask(taskId);
         } else if (epicSubTaskIdMap.containsKey(taskId)) {
-            int epicTaskId = epicSubTaskIdMap.get(taskId);
-            EpicTask epicObject = epicTaskMap.get(epicTaskId);
-            return epicObject.getSubTaskMap().get(taskId);
+            return getSubTask(taskId);
         }
         return null;
     }
 
+    @Override
+    public Task getTask(int taskId) {
+        Task task = taskMap.get(taskId);
+        historyManager.add(task);
+        return task;
+    }
+
+    @Override
+    public Task getEpicTask(int taskId) {
+        Task task = epicTaskMap.get(taskId);
+        historyManager.add(task);
+        return task;
+    }
+
+    @Override
+    public Task getSubTask(int taskId) {
+        int epicTaskId = epicSubTaskIdMap.get(taskId);
+        EpicTask epicObject = epicTaskMap.get(epicTaskId);
+        Task task = epicObject.getSubTaskMap().get(taskId);
+        historyManager.add(task);
+        return task;
+    }
+
     //удалить по ID
-    public void deleteOneTask(int taskId) {
+    public void deleteTaskById(int taskId) {
 
         if (taskMap.containsKey(taskId)) {
-            taskMap.remove(taskId);
-            System.out.println("Задача под номером: " + taskId + " удалена.");
+            deleteTask(taskId);
         } else if (epicTaskMap.containsKey(taskId)) {
-            epicTaskMap.remove(taskId);
-            System.out.println("Эпик под номером: " + taskId + " и все его подзадачи удалены.");
+            deleteEpicTask(taskId);
         } else if (epicSubTaskIdMap.containsKey(taskId)) {
-
-            int epicTaskId = epicSubTaskIdMap.get(taskId);
-            EpicTask epicObject = epicTaskMap.get(epicTaskId);
-            epicObject.getSubTaskMap().remove(taskId);
-            epicSubTaskIdMap.remove(taskId);
-            System.out.println("Подзадача эпика: " + epicTaskId + ", под номером: " + taskId + " удалена.");
+            deleteSubTask(taskId);
         } else {
             System.out.println("Задачи с таким ID нет");
         }
     }
 
+    @Override
+    public void deleteTask(int taskId) {
+        taskMap.remove(taskId);
+        System.out.println("Задача под номером: " + taskId + " удалена.");
+    }
+
+    @Override
+    public void deleteEpicTask(int taskId) {
+        epicTaskMap.remove(taskId);
+        System.out.println("Эпик под номером: " + taskId + " и все его подзадачи удалены.");
+    }
+
+    @Override
+    public void deleteSubTask(int taskId) {
+        int epicTaskId = epicSubTaskIdMap.get(taskId);
+        EpicTask epicObject = epicTaskMap.get(epicTaskId);
+        epicObject.getSubTaskMap().remove(taskId);
+        epicSubTaskIdMap.remove(taskId);
+        System.out.println("Подзадача эпика: " + epicTaskId + ", под номером: " + taskId + " удалена.");
+    }
+
     //печать всех задач
+    @Override
     public void printAllTypesTasks() {
         System.out.println(taskMap);
         System.out.println(epicTaskMap);
     }
 
     //печать задач
+    @Override
     public void printAllTasks() {
 
         if (!taskMap.isEmpty()) {
@@ -185,6 +237,7 @@ public class Manager {
     }
 
     //печать эпиков
+    @Override
     public void printAllEpicTasks() {
 
         if (!epicTaskMap.isEmpty()) {
@@ -197,6 +250,7 @@ public class Manager {
     }
 
     //печать подзадач
+    @Override
     public void printAllSubTasks() {
 
         if (!epicTaskMap.isEmpty()) {
@@ -204,7 +258,7 @@ public class Manager {
                 System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     for (SubTask subObject : epicObject.getSubTaskMap().values())
-                        System.out.println("Подазадача: " + subObject.getTaskName());
+                        System.out.println("Подзадача: " + subObject.getTaskName());
                 } else {
                     System.out.println("Нет подзадач");
                 }
@@ -215,6 +269,7 @@ public class Manager {
     }
 
     //удалить все задачи
+    @Override
     public void deleteAllTasks() {
 
         if (!taskMap.isEmpty()) {
@@ -226,6 +281,7 @@ public class Manager {
     }
 
     //удалить все эпики
+    @Override
     public void deleteAllEpicTasks() {
 
         if (!epicTaskMap.isEmpty()) {
@@ -237,6 +293,7 @@ public class Manager {
     }
 
     //удалить все подзадачи
+    @Override
     public void deleteAllSubTasks() {
 
         if (!epicSubTaskIdMap.isEmpty()) {

@@ -1,17 +1,19 @@
 package ru.mikhailantonov.taskmanager.task;
 
+import ru.mikhailantonov.taskmanager.util.StatusType;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+
+/** Класс для объектов Эпик задач */
 
 public class EpicTask extends Task {
 
     private HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
     public EpicTask(String taskName, String taskDescription) {
-
-        this.taskName = taskName;
-        this.taskDescription = taskDescription;
+        super(taskName, taskDescription);
     }
 
     public StatusType epicStatusType() {
@@ -25,9 +27,9 @@ public class EpicTask extends Task {
 
             for (int i : subTaskMap.keySet()) {
                 SubTask object = subTaskMap.get(i);
-                if (object.getTaskStatus().equals(StatusType.NEW)) {
+                if (StatusType.NEW.equals(object.getTaskStatus())) {
                     check1.add(i);
-                } else if (object.getTaskStatus().equals(StatusType.DONE)) {
+                } else if (StatusType.DONE.equals(object.getTaskStatus())) {
                     check2.add(i);
                 }
             }
