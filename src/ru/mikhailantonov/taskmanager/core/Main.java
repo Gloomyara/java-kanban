@@ -50,7 +50,7 @@ public class Main {
         //печать всех задач
         taskManager.printAllTypesTasks();
         //история просмотров
-        System.out.println("История: " + Managers.getDefaultHistory());
+        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
@@ -64,7 +64,7 @@ public class Main {
         //печать всех задач
         //Managers.getDefault().printAllTypesTasks();
         //история просмотров
-        System.out.println("История: " + Managers.getDefaultHistory());
+        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
@@ -81,7 +81,7 @@ public class Main {
         //печать всех задач
         //Managers.getDefault().printAllTypesTasks();
         //история просмотров
-        System.out.println("История: " + Managers.getDefaultHistory());
+        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
 
         //печать задач 1 эпика
         taskManager.printOneEpicSubTasks(3);

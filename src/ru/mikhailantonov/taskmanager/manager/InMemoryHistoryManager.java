@@ -8,15 +8,15 @@ import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private ArrayList<String> taskRequestHistory = new ArrayList<>();
+    private ArrayList<Task> taskRequestHistory = new ArrayList<>();
 
     @Override
     public void add(Task task) {
         if (taskRequestHistory.size() < 10) {
-            taskRequestHistory.add(task.getTaskName());
+            taskRequestHistory.add(task);
         } else {
             taskRequestHistory.remove(0);
-            taskRequestHistory.add(task.getTaskName());
+            taskRequestHistory.add(task);
         }
     }
 
