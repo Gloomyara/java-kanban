@@ -26,14 +26,6 @@ public interface TaskManager {
 
     Task getSubTask(int taskId);
 
-    void deleteTaskById(int taskId);
-
-    void deleteTask(int taskId);
-
-    void deleteEpicTask(int taskId);
-
-    void deleteSubTask(int taskId);
-
     ArrayList<Task> getOneEpicSubTasks(int epicTaskId);
 
     ArrayList<Task> getAllTypesTasks();
@@ -43,6 +35,14 @@ public interface TaskManager {
     ArrayList<Task> getAllEpicTasks();
 
     ArrayList<Task> getAllSubTasks();
+
+    void deleteTaskById(int taskId);
+
+    void deleteTask(int taskId);
+
+    void deleteEpicTask(int taskId);
+
+    void deleteSubTask(int taskId);
 
     void deleteAllTasks();
 
