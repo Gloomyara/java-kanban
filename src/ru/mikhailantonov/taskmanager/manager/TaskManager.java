@@ -36,7 +36,7 @@ public interface TaskManager {
 
     ArrayList<Task> getOneEpicSubTasks(int epicTaskId);
 
-    ArrayList<Task> printAllTypesTasks();
+    ArrayList<Task> getAllTypesTasks();
 
     ArrayList<Task> getAllTasks();
 

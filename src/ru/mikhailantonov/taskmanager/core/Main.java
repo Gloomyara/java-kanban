@@ -34,7 +34,7 @@ public class Main {
             System.out.println(object);
         }
         //печать всех задач
-        taskManager.printAllTypesTasks();
+        taskManager.getAllTypesTasks();
         //история просмотров
         System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
 
@@ -75,6 +75,6 @@ public class Main {
         taskManager.deleteTaskById(4);
 
         //печать всех задач
-        System.out.println(taskManager.printAllTypesTasks());
+        System.out.println(taskManager.getAllTypesTasks());
     }
 }

@@ -221,7 +221,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //печать всех задач
     @Override
-    public ArrayList<Task> printAllTypesTasks() {
+    public ArrayList<Task> getAllTypesTasks() {
         ArrayList<Task> allTasksList = new ArrayList<>();
 
         allTasksList.addAll(getAllTasks());
