@@ -4,7 +4,9 @@ import ru.mikhailantonov.taskmanager.task.*;
 
 import java.util.ArrayList;
 
-/** Класс для хранения истории просмотров задач, через методы getTaskByID */
+/**
+ * Класс для хранения истории просмотров задач, через методы getTaskByID
+ */
 
 public class InMemoryHistoryManager implements HistoryManager {
 
@@ -21,7 +23,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public String getHistory() {
-        return taskRequestHistory.toString();
+    public ArrayList<Task> getHistory() {
+        return taskRequestHistory;
     }
 }

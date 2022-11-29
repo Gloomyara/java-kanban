@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-/** Класс для объектов Эпик задач */
+/**
+ * Класс для объектов Эпик задач
+ */
 
 public class EpicTask extends Task {
 

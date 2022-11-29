@@ -2,7 +2,9 @@ package ru.mikhailantonov.taskmanager.task;
 
 import ru.mikhailantonov.taskmanager.util.StatusType;
 
-/** Класс для объектов подзадач */
+/**
+ * Класс для объектов подзадач
+ */
 
 public class SubTask extends Task {
     private int epicTaskId;

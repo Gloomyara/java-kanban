@@ -2,10 +2,15 @@ package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
 
-/** Базовый интерфейс менеджеров по хранению истории */
+import java.util.ArrayList;
+
+/**
+ * Базовый интерфейс менеджеров по хранению истории
+ */
 
 public interface HistoryManager {
     void add(Task task);
-    String getHistory();
+
+    ArrayList<Task> getHistory();
 }
 

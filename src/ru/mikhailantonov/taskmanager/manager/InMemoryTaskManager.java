@@ -1,29 +1,30 @@
 package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
+import ru.mikhailantonov.taskmanager.util.Managers;
 import ru.mikhailantonov.taskmanager.util.StatusType;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-/** Класс нашего самого 1ого менеджера, для обработки и хранения объектов задач */
+/**
+ * Класс нашего самого 1ого менеджера, для обработки и хранения объектов задач
+ */
 
 public class InMemoryTaskManager implements TaskManager {
 
-    HistoryManager historyManager = new InMemoryHistoryManager();
+    HistoryManager historyManager = Managers.getHistoryManager();
     int id = 1; //было нужно для тестов
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
     private HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
 
-    @Override
-    public String getHistory() {
-        return historyManager.getHistory();
-    }
+    private ArrayList<Task> tasksList;
 
     //обработка входящей задачи
     @Override
-    public void manageObject(Task object) {
+    public void manageTaskObject(Task object) {
 
         if (object.getTaskId() == null) {
             object.setTaskId(id);
@@ -132,21 +133,23 @@ public class InMemoryTaskManager implements TaskManager {
 
     //метод для печати всех подзадач 1 эпика
     @Override
-    public void printOneEpicSubTasks(int epicTaskId) {
+    public ArrayList<Task> getOneEpicSubTasks(int epicTaskId) {
+
+        tasksList = new ArrayList<>();
+
         if (epicTaskMap.containsKey(epicTaskId)) {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
-            System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
-            for (SubTask subObject : epicObject.getSubTaskMap().values()) {
-                System.out.println("Подзадача: " + subObject.getTaskName());
-            }
+            tasksList.addAll(epicObject.getSubTaskMap().values());
         } else {
             System.out.println("Ошибка! эпик задача не найдена");
+            return null;
         }
+        return tasksList;
     }
 
     //получить задачу по ID
     @Override
-    public Task getObjectById(int taskId) {
+    public Task getTaskObjectById(int taskId) {
 
         if (taskMap.containsKey(taskId)) {
             return getTask(taskId);
@@ -218,54 +221,62 @@ public class InMemoryTaskManager implements TaskManager {
 
     //печать всех задач
     @Override
-    public void printAllTypesTasks() {
-        System.out.println(taskMap);
-        System.out.println(epicTaskMap);
+    public ArrayList<Task> printAllTypesTasks() {
+        ArrayList<Task> allTasksList = new ArrayList<>();
+
+        allTasksList.addAll(getAllTasks());
+        allTasksList.addAll(getAllEpicTasks());
+        allTasksList.addAll(getAllSubTasks());
+
+        return allTasksList;
     }
 
     //печать задач
     @Override
-    public void printAllTasks() {
+    public ArrayList<Task> getAllTasks() {
+        tasksList = new ArrayList<>();
 
         if (!taskMap.isEmpty()) {
-            for (Task object : taskMap.values()) {
-                System.out.println(object.getTaskName());
-            }
+            tasksList.addAll(taskMap.values());
         } else {
             System.out.println("Ошибка! не найдено задач!");
+            return null;
         }
+        return tasksList;
     }
 
     //печать эпиков
     @Override
-    public void printAllEpicTasks() {
+    public ArrayList<Task> getAllEpicTasks() {
+        tasksList = new ArrayList<>();
 
         if (!epicTaskMap.isEmpty()) {
-            for (EpicTask epicObject : epicTaskMap.values()) {
-                System.out.println(epicObject.getTaskName());
-            }
+            tasksList.addAll(epicTaskMap.values());
         } else {
-            System.out.println("Ошибка! не найдено эпиков'!");
+            System.out.println("Ошибка! не найдено эпиков!");
+            return null;
         }
+        return tasksList;
     }
 
     //печать подзадач
     @Override
-    public void printAllSubTasks() {
+    public ArrayList<Task> getAllSubTasks() {
+        tasksList = new ArrayList<>();
 
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
-                System.out.println("Подзадачи эпика: " + epicObject.getTaskName());
                 if (!epicObject.getSubTaskMap().isEmpty()) {
-                    for (SubTask subObject : epicObject.getSubTaskMap().values())
-                        System.out.println("Подзадача: " + subObject.getTaskName());
+                    tasksList.addAll(epicObject.getSubTaskMap().values());
                 } else {
-                    System.out.println("Нет подзадач");
+                    System.out.println("У эпика: " + epicObject.getTaskName() + " нет подзадач");
                 }
             }
         } else {
             System.out.println("Нет подзадач");
+            return null;
         }
+        return tasksList;
     }
 
     //удалить все задачи

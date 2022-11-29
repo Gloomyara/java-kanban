@@ -4,7 +4,9 @@ import ru.mikhailantonov.taskmanager.util.StatusType;
 
 import java.util.Calendar;
 
-/** Родительский класс для объектов всех задач */
+/**
+ * Родительский класс для объектов всех задач
+ */
 
 public class Task {
     protected Integer taskId;
@@ -15,15 +17,13 @@ public class Task {
     protected Calendar taskUpdateDate;
     protected Calendar taskCloseDate = null;
 
-    Task(){
-
-    }
     public Task(String taskName, String taskDescription) {
 
         this.taskName = taskName;
         this.taskDescription = taskDescription;
 
     }
+
     public Task(String taskName, String taskDescription, StatusType taskStatus) {
 
         this.taskName = taskName;
@@ -87,8 +87,6 @@ public class Task {
     public void setTaskStatus(StatusType statusType) {
         this.taskStatus = statusType;
     }
-
-
 
     @Override
     public String toString() {
