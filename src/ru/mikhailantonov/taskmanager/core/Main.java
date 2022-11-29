@@ -67,7 +67,7 @@ public class Main {
 
         //печать задач 1 эпика
         System.out.println("Подзадачи Эпика: " + taskManager.getTaskObjectById(3).getTaskName() + " : "
-                + taskManager.getOneEpicSubTasks(3).toString());
+                + taskManager.getOneEpicSubTasks(3));
 
         //удаление 3х задач
         taskManager.deleteTaskById(1);
@@ -75,6 +75,6 @@ public class Main {
         taskManager.deleteTaskById(4);
 
         //печать всех задач
-        System.out.println(taskManager.printAllTypesTasks().toString());
+        System.out.println(taskManager.printAllTypesTasks());
     }
 }
