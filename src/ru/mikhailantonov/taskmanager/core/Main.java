@@ -7,6 +7,21 @@ import ru.mikhailantonov.taskmanager.task.*;
 public class Main {
 
     //Доброго времени суток, уважаемый Артем!
+    //В Managers метод getDefaultHistory(), не потерянный, он всегда там был т.к. в тз сказано:
+    /*
+     *Добавьте в служебный класс Managers статический метод HistoryManager getDefaultHistory().
+     *Он должен возвращать объект InMemoryHistoryManager — историю просмотров.
+     */
+    //То есть следуя логике написанного в InMemoryTaskManager метод getHistory() не нужен...
+    //Или же мне нужно передать лист из InMemoryHistoryManager в InMemoryTaskManager, через getDefaultHistory(),
+    //а уже в Main вызывать getHistory из InMemoryTaskManager, который вернет getDefaultHistory()?
+    //Что-то не понимаю ни чего, как правильно в итоге?)))
+    //В любом случае, видимо, зря удалил метод из InMemoryTaskManager,
+    //поскольку не очень понимаю зачем нужно 2 таких метода...
+    //Добавил условие для создания менеджеров, так-то 1 из них используется в getDefaultHistory();
+    //Можно обойтись без этого, сделал как раз без использования этих полей, в ТЗ же не сказано,
+    //что getDefaultHistory() должен быть без параметров?
+    //Спасибо за наставления!
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
@@ -36,7 +51,7 @@ public class Main {
         //печать всех задач
         taskManager.getAllTypesTasks();
         //история просмотров
-        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
+        System.out.println("История: ***" + Managers.getDefaultHistory(taskManager) + "***");
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
@@ -48,7 +63,7 @@ public class Main {
         }
 
         //история просмотров
-        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
+        System.out.println("История: ***" + Managers.getDefaultHistory(taskManager) + "***");
 
         //обновление статусов задач
         for (int i = 1; i < 8; i++) {
@@ -63,7 +78,7 @@ public class Main {
         taskManager.getTaskObjectById(5);
 
         //история просмотров
-        System.out.println("История: ***" + Managers.getDefaultHistory() + "***");
+        System.out.println("История: ***" + Managers.getDefaultHistory(taskManager) + "***");
 
         //печать задач 1 эпика
         System.out.println("Подзадачи Эпика: " + taskManager.getTaskObjectById(3).getTaskName() + " : "

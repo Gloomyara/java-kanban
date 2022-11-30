@@ -15,16 +15,20 @@ public class Managers {
     private static HistoryManager h;
 
     public static TaskManager getDefault() {
-        t = new InMemoryTaskManager();
+        if (t == null) {
+            t = new InMemoryTaskManager();
+        }
         return t;
     }
 
     public static HistoryManager getHistoryManager() {
-        h = new InMemoryHistoryManager();
+        if (h == null) {
+            h = new InMemoryHistoryManager();
+        }
         return h;
     }
 
-    public static ArrayList<Task> getDefaultHistory() {
-        return h.getHistory();
+    public static ArrayList<Task> getDefaultHistory(TaskManager taskManager) {
+        return taskManager.getHistory();
     }
 }

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 
 public interface TaskManager {
 
+    ArrayList<Task> getHistory();
+
     void manageTaskObject(Task object);
 
     void manageTask(Task taskObject);

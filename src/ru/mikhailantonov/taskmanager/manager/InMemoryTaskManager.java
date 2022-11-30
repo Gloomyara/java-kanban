@@ -14,12 +14,22 @@ import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    HistoryManager historyManager = Managers.getHistoryManager();
+    private HistoryManager historyManager = Managers.getHistoryManager();
     int id = 1; //было нужно для тестов
     private HashMap<Integer, Task> taskMap = new HashMap<>();
     private HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
     private HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
     private ArrayList<Task> tasksList;
+
+    @Override
+    public ArrayList<Task> getHistory() {
+        if (!historyManager.getHistory().isEmpty()) {
+            return historyManager.getHistory();
+        } else {
+            System.out.println("Ошибка! История просмотров не найдена");
+            return null;
+        }
+    }
 
     //обработка входящей задачи
     @Override
