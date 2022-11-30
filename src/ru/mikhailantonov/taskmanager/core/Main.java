@@ -15,14 +15,13 @@ public class Main {
     //То есть следуя логике написанного в InMemoryTaskManager метод getHistory() не нужен...
     //Или же мне нужно передать лист из InMemoryHistoryManager в InMemoryTaskManager, через getDefaultHistory(),
     //а уже в Main вызывать getHistory из InMemoryTaskManager, который вернет getDefaultHistory()?
-    //Так и сделал...
+    //В ТЗ человеческим языком сложно же написать, что нужно сделать, getDefaultHistory так понимаю
+    //(наконец то дошло) нужен для создания InMemoryHistoryManager?...
     //Что-то не понимаю ни чего, как правильно в итоге?)))
     //В любом случае, видимо, зря удалил метод из InMemoryTaskManager,
     //удалил поскольку не очень понимаю зачем нужно 2 таких метода...
     //Добавил условие для создания менеджеров, так-то 1 из них используется в getDefaultHistory();
-    //Можно обойтись без этого, сделал как раз без использования этих полей, в ТЗ же не сказано,
-    //что getDefaultHistory() должен быть без параметров?
-    //Спасибо за наставления!
+        //Спасибо за наставления!
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
@@ -50,7 +49,7 @@ public class Main {
             System.out.println(object);
         }
         //печать всех задач
-        taskManager.getAllTypesTasks();
+        System.out.println(taskManager.getAllTypesTasks());
         //история просмотров
         System.out.println("История: ***" + taskManager.getHistory() + "***");
 
