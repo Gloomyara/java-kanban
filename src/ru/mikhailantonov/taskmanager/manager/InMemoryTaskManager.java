@@ -23,12 +23,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getHistory() {
-        if (!historyManager.getHistory().isEmpty()) {
-            return historyManager.getHistory();
-        } else {
-            System.out.println("Ошибка! История просмотров не найдена");
-            return null;
-        }
+        return Managers.getDefaultHistory(historyManager);
     }
 
     //обработка входящей задачи

@@ -28,7 +28,12 @@ public class Managers {
         return h;
     }
 
-    public static ArrayList<Task> getDefaultHistory(TaskManager taskManager) {
-        return taskManager.getHistory();
+    public static ArrayList<Task> getDefaultHistory(HistoryManager historyManager) {
+        if (!historyManager.getHistory().isEmpty()) {
+            return historyManager.getHistory();
+        } else {
+            System.out.println("Ошибка! История просмотров не найдена");
+            return null;
+        }
     }
 }
