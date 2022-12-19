@@ -75,42 +75,40 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (node.prev == null) {
             if (node.next != null) {
-                Node<Task> next = node.next;
-                next.prev = null;
-                head = next;
+                Node<Task> nextTask = node.next;
+                nextTask.prev = null;
+                head = nextTask;
             }
         } else if (node.next == null) {
-            Node<Task> prev = node.prev;
-            prev.next = null;
-            tail = prev;
+            Node<Task> prevTask = node.prev;
+            prevTask.next = null;
+            tail = prevTask;
         } else {
-            Node<Task> prev = node.prev;
-            Node<Task> next = node.next;
-            prev.next = next;
-            next.prev = prev;
+            Node<Task> prevTask = node.prev;
+            Node<Task> nextTask = node.next;
+            prevTask.next = nextTask;
+            nextTask.prev = prevTask;
         }
         node = null;
         size--;
     }
 
     private ArrayList<Task> getTasks() {
-
         ArrayList<Task> utilList = new ArrayList<>();
 
-        if (head != null) {
-            Node<Task> t = head;
-            utilList.add(t.data);
-            for (int i = 1; i < size(); i++) {
-                if (t.next != null) {
-                    Node<Task> n = t.next;
-                    utilList.add(n.data);
-                    t = n;
-                }
-            }
-            return utilList;
-        } else {
+        if (head == null) {
             return null;
         }
+        Node<Task> task = head;
+        utilList.add(task.value);
+        for (int i = 1; i < size(); i++) {
+            if (task.next != null) {
+                Node<Task> nextTask = task.next;
+                utilList.add(nextTask.value);
+                task = nextTask;
+            }
+        }
+        return utilList;
     }
 }
 
