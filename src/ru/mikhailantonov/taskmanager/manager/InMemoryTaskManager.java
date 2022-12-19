@@ -259,14 +259,11 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean deleteTaskById(int taskId) {
 
         if (taskMap.containsKey(taskId)) {
-            deleteTask(taskId);
-            return true;
+            return deleteTask(taskId);
         } else if (epicTaskMap.containsKey(taskId)) {
-            deleteEpicTask(taskId);
-            return true;
+            return deleteEpicTask(taskId);
         } else if (epicSubTaskIdMap.containsKey(taskId)) {
-            deleteSubTask(taskId);
-            return true;
+            return deleteSubTask(taskId);
         } else {
             System.out.println("Задачи с таким ID нет");
             return false;
@@ -274,14 +271,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(int taskId) {
+    public boolean deleteTask(int taskId) {
         taskMap.remove(taskId);
         historyManager.remove(taskId);
         System.out.println("Задача под номером: " + taskId + " удалена.");
+        return true;
     }
 
     @Override
-    public void deleteEpicTask(int taskId) {
+    public boolean deleteEpicTask(int taskId) {
         EpicTask epicObject = epicTaskMap.get(taskId);
         for (Task task : epicObject.getSubTaskMap().values()) {
             historyManager.remove(task.getTaskId());
@@ -290,16 +288,18 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.remove(taskId);
         epicTaskMap.remove(taskId);
         System.out.println("Эпик под номером: " + taskId + " и все его подзадачи удалены.");
+        return true;
     }
 
     @Override
-    public void deleteSubTask(int taskId) {
+    public boolean deleteSubTask(int taskId) {
         int epicTaskId = epicSubTaskIdMap.get(taskId);
         EpicTask epicObject = epicTaskMap.get(epicTaskId);
         epicObject.getSubTaskMap().remove(taskId);
         epicSubTaskIdMap.remove(taskId);
         historyManager.remove(taskId);
         System.out.println("Подзадача эпика: " + epicTaskId + ", под номером: " + taskId + " удалена.");
+        return true;
     }
 
     //удалить все задачи

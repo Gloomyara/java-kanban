@@ -40,11 +40,11 @@ public interface TaskManager {
 
     boolean deleteTaskById(int taskId);
 
-    void deleteTask(int taskId);
+    boolean deleteTask(int taskId);
 
-    void deleteEpicTask(int taskId);
+    boolean deleteEpicTask(int taskId);
 
-    void deleteSubTask(int taskId);
+    boolean deleteSubTask(int taskId);
 
     boolean deleteAllTasks();
 
