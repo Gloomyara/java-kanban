@@ -124,13 +124,16 @@ public class InMemoryHistoryManager implements HistoryManager {
             node.data = null;
             node.next = null;
             node.prev = null;
+            node = null;
             size--;
         }
 
         public ArrayList<T> getTasks() {
+
             ArrayList<T> utilList = new ArrayList<>();
-            Node<T> t = head;
-            if (t.data != null) {
+
+            if (head != null) {
+                Node<T> t = head;
                 utilList.add(t.data);
                 for (int i = 1; i < size(); i++) {
                     if (t.next != null) {
