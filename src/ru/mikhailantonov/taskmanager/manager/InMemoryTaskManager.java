@@ -256,16 +256,20 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //удалить по ID
-    public void deleteTaskById(int taskId) {
+    public boolean deleteTaskById(int taskId) {
 
         if (taskMap.containsKey(taskId)) {
             deleteTask(taskId);
+            return true;
         } else if (epicTaskMap.containsKey(taskId)) {
             deleteEpicTask(taskId);
+            return true;
         } else if (epicSubTaskIdMap.containsKey(taskId)) {
             deleteSubTask(taskId);
+            return true;
         } else {
             System.out.println("Задачи с таким ID нет");
+            return false;
         }
     }
 
@@ -300,7 +304,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //удалить все задачи
     @Override
-    public void deleteAllTasks() {
+    public boolean deleteAllTasks() {
 
         if (!taskMap.isEmpty()) {
             for (Task task : taskMap.values()) {
@@ -308,14 +312,16 @@ public class InMemoryTaskManager implements TaskManager {
             }
             taskMap.clear();
             System.out.println("все задачи удалены");
+            return true;
         } else {
             System.out.println("Нечего удалять");
+            return false;
         }
     }
 
     //удалить все эпики
     @Override
-    public void deleteAllEpicTasks() {
+    public boolean deleteAllEpicTasks() {
 
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
@@ -329,14 +335,16 @@ public class InMemoryTaskManager implements TaskManager {
             epicSubTaskIdMap.clear();
             epicTaskMap.clear();
             System.out.println("все эпики удалены");
+            return true;
         } else {
             System.out.println("Нечего удалять");
+            return false;
         }
     }
 
     //удалить все подзадачи
     @Override
-    public void deleteAllSubTasks() {
+    public boolean deleteAllSubTasks() {
 
         if (!epicSubTaskIdMap.isEmpty()) {
             epicSubTaskIdMap.clear();
@@ -351,8 +359,10 @@ public class InMemoryTaskManager implements TaskManager {
                     System.out.println("В эпике под номером: " + epicObject.getTaskId() + " Нечего удалять");
                 }
             }
+            return true;
         } else {
             System.out.println("Нечего удалять");
+            return false;
         }
     }
 }

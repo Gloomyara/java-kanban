@@ -38,7 +38,7 @@ public interface TaskManager {
 
     List<Task> getAllSubTasks();
 
-    void deleteTaskById(int taskId);
+    boolean deleteTaskById(int taskId);
 
     void deleteTask(int taskId);
 
@@ -46,10 +46,10 @@ public interface TaskManager {
 
     void deleteSubTask(int taskId);
 
-    void deleteAllTasks();
+    boolean deleteAllTasks();
 
-    void deleteAllEpicTasks();
+    boolean deleteAllEpicTasks();
 
-    void deleteAllSubTasks();
+    boolean deleteAllSubTasks();
 
 }
