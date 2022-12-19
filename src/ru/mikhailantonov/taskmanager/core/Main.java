@@ -79,5 +79,12 @@ public class Main {
         System.out.println("История: ***" + taskManager.getHistory() + "***");
         //печать всех задач
         System.out.println(taskManager.getAllTypesTasks());
+
+        taskManager.deleteAllTasks();
+        System.out.println("История: ***" + taskManager.getHistory() + "***");
+        taskManager.deleteAllSubTasks();
+        System.out.println("История: ***" + taskManager.getHistory() + "***");
+        taskManager.deleteAllEpicTasks();
+        taskManager.getHistory();
     }
 }

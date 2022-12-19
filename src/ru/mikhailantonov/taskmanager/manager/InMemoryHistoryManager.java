@@ -35,7 +35,12 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return taskRequestHistory.getTasks();
+        if (taskRequestHistory.getTasks() != null) {
+            return taskRequestHistory.getTasks();
+        } else {
+            System.out.println("Ошибка! Нет задач");
+            return null;
+        }
     }
 
     public static class HandMadeLinkedList<T> {
@@ -101,9 +106,11 @@ public class InMemoryHistoryManager implements HistoryManager {
         public void removeNode(Node<T> node) {
 
             if (node.prev == null) {
-                Node<T> next = node.next;
-                next.prev = null;
-                head = next;
+                if (node.next != null) {
+                    Node<T> next = node.next;
+                    next.prev = null;
+                    head = next;
+                }
             } else if (node.next == null) {
                 Node<T> prev = node.prev;
                 prev.next = null;
@@ -123,15 +130,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         public ArrayList<T> getTasks() {
             ArrayList<T> utilList = new ArrayList<>();
             Node<T> t = head;
-            utilList.add(t.data);
-            for (int i = 1; i < size(); i++) {
-                if (t.next != null) {
-                    Node<T> n = t.next;
-                    utilList.add(n.data);
-                    t = n;
+            if (t.data != null) {
+                utilList.add(t.data);
+                for (int i = 1; i < size(); i++) {
+                    if (t.next != null) {
+                        Node<T> n = t.next;
+                        utilList.add(n.data);
+                        t = n;
+                    }
                 }
+                return utilList;
+            } else {
+                return null;
             }
-            return utilList;
         }
     }
 }

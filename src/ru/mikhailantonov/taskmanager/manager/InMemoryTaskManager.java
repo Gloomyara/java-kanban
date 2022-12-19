@@ -25,7 +25,7 @@ public class InMemoryTaskManager implements TaskManager {
     //вернуть историю просмотров
     @Override
     public List<Task> getHistory() {
-        if (!historyManager.getHistory().isEmpty()) {
+        if (historyManager.getHistory() != null) {
             return historyManager.getHistory();
         } else {
             System.out.println("Ошибка! История просмотров не найдена");
@@ -303,6 +303,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllTasks() {
 
         if (!taskMap.isEmpty()) {
+            for (Task task : taskMap.values()) {
+                historyManager.remove(task.getTaskId());
+            }
             taskMap.clear();
             System.out.println("все задачи удалены");
         } else {
@@ -315,6 +318,15 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllEpicTasks() {
 
         if (!epicTaskMap.isEmpty()) {
+            for (EpicTask epicObject : epicTaskMap.values()) {
+                for (Task task : epicObject.getSubTaskMap().values()) {
+                    if (!epicObject.getSubTaskMap().isEmpty()) {
+                        historyManager.remove(task.getTaskId());
+                    }
+                }
+                historyManager.remove(epicObject.getTaskId());
+            }
+            epicSubTaskIdMap.clear();
             epicTaskMap.clear();
             System.out.println("все эпики удалены");
         } else {
@@ -330,6 +342,9 @@ public class InMemoryTaskManager implements TaskManager {
             epicSubTaskIdMap.clear();
             for (EpicTask epicObject : epicTaskMap.values()) {
                 if (!epicObject.getSubTaskMap().isEmpty()) {
+                    for (Task task : epicObject.getSubTaskMap().values()) {
+                        historyManager.remove(task.getTaskId());
+                    }
                     epicObject.getSubTaskMap().clear();
                     System.out.println("В эпике под номером: " + epicObject.getTaskId() + " все подзадачи удалены");
                 } else {
