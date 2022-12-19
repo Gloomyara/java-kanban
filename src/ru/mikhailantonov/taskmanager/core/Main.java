@@ -7,18 +7,7 @@ import ru.mikhailantonov.taskmanager.task.*;
 public class Main {
 
     //Доброго времени суток, уважаемый Артем!
-    //В Managers метод getDefaultHistory(), не потерянный, он всегда там был т.к. в тз сказано:
-    /*
-     *Добавьте в служебный класс Managers статический метод HistoryManager getDefaultHistory().
-     *Он должен возвращать объект InMemoryHistoryManager — историю просмотров.
-     */
-    //То есть следуя логике написанного в InMemoryTaskManager метод getHistory() не нужен...
-    //Или же мне нужно передать лист из InMemoryHistoryManager в InMemoryTaskManager, через getDefaultHistory(),
-    //а уже в Main вызывать getHistory из InMemoryTaskManager, который вернет getDefaultHistory()?
-    // ...
-    //В ТЗ человеческим языком сложно же написать, что нужно сделать, getDefaultHistory так понимаю
-    //(наконец-то дошло) нужен для создания InMemoryHistoryManager...
-    //Спасибо за наставления!
+
 
     public static void main(String[] args) {
         System.out.println("Поехали!");
@@ -28,10 +17,11 @@ public class Main {
         Task taskObject1 = new Task("Задача1", "adsf", StatusType.NEW);
         Task taskObject2 = new Task("Задача2", "fdsa", StatusType.NEW);
         Task taskObject3 = new EpicTask("ЭпикЗадача1", "fddadsf");
-        Task taskObject4 = new SubTask(3, "ПодЗадача1", "asdfsa", StatusType.NEW);
-        Task taskObject5 = new SubTask(3, "ПодЗадача2", "fdfasdf", StatusType.NEW);
+        Task taskObject4 = new SubTask(3, "Э1 ПодЗадача1", "asdfsa", StatusType.NEW);
+        Task taskObject5 = new SubTask(3, "Э1 ПодЗадача2", "fdfasdf", StatusType.NEW);
         Task taskObject6 = new EpicTask("ЭпикЗадача2", "fsgnbdfg");
-        Task taskObject7 = new SubTask(6, "ПодЗадача1", "asdfsa", StatusType.NEW);
+        Task taskObject7 = new SubTask(6, "Э2 ПодЗадача1", "asdfsa", StatusType.NEW);
+        Task taskObject8 = new SubTask(3, "Э1 ПодЗадача3", "fdfxx", StatusType.NEW);
         //распределить по типу
         taskManager.manageTaskObject(taskObject1);
         taskManager.manageTaskObject(taskObject2);
@@ -40,8 +30,9 @@ public class Main {
         taskManager.manageTaskObject(taskObject5);
         taskManager.manageTaskObject(taskObject6);
         taskManager.manageTaskObject(taskObject7);
+        taskManager.manageTaskObject(taskObject8);
         //печать всех задач через toString
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i < 9; i++) {
             Task object = taskManager.getTaskObjectById(i);
             System.out.println(object);
         }
@@ -51,7 +42,7 @@ public class Main {
         System.out.println("История: ***" + taskManager.getHistory() + "***");
 
         //обновление статусов задач
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i < 9; i++) {
             Task object = taskManager.getTaskObjectById(i);
             if (!(object instanceof EpicTask)) {
                 object.setTaskStatus(StatusType.IN_PROGRESS);
@@ -63,7 +54,7 @@ public class Main {
         System.out.println("История: ***" + taskManager.getHistory() + "***");
 
         //обновление статусов задач
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i < 9; i++) {
             Task object = taskManager.getTaskObjectById(i);
             if (!(object instanceof EpicTask)) {
                 object.setTaskStatus(StatusType.DONE);
@@ -83,9 +74,9 @@ public class Main {
 
         //удаление 3х задач
         taskManager.deleteTaskById(1);
-        taskManager.deleteTaskById(6);
+        taskManager.deleteTaskById(3);
         taskManager.deleteTaskById(4);
-
+        System.out.println("История: ***" + taskManager.getHistory() + "***");
         //печать всех задач
         System.out.println(taskManager.getAllTypesTasks());
     }

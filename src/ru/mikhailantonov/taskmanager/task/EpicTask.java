@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class EpicTask extends Task {
 
-    private HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
+    private final HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
     public EpicTask(String taskName, String taskDescription) {
         super(taskName, taskDescription);

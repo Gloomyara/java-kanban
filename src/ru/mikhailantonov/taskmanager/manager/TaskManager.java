@@ -2,7 +2,7 @@ package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Базовый интерфейс менеджеров по работе с задачами
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public interface TaskManager {
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 
     void manageTaskObject(Task object);
 
@@ -28,15 +28,15 @@ public interface TaskManager {
 
     Task getSubTask(int taskId);
 
-    ArrayList<Task> getOneEpicSubTasks(int epicTaskId);
+    List<Task> getOneEpicSubTasks(int epicTaskId);
 
-    ArrayList<Task> getAllTypesTasks();
+    List<Task> getAllTypesTasks();
 
-    ArrayList<Task> getAllTasks();
+    List<Task> getAllTasks();
 
-    ArrayList<Task> getAllEpicTasks();
+    List<Task> getAllEpicTasks();
 
-    ArrayList<Task> getAllSubTasks();
+    List<Task> getAllSubTasks();
 
     void deleteTaskById(int taskId);
 
