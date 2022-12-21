@@ -46,12 +46,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        if (getTasks() != null) {
-            return getTasks();
-        } else {
-            System.out.println("Ошибка! Нет задач");
-            return null;
-        }
+        return getTasks();
     }
 
     private void linkLast(Task element) {
@@ -62,7 +57,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.next = newNode;
+            oldTail.setNext(newNode);
         }
         size++;
     }
@@ -73,23 +68,22 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void removeNode(Node<Task> node) {
 
-        if (node.prev == null) {
-            if (node.next != null) {
-                Node<Task> nextTask = node.next;
-                nextTask.prev = null;
+        if (node.getPrev() == null) {
+            if (node.getNext() != null) {
+                Node<Task> nextTask = node.getNext();
+                nextTask.setPrev(null);
                 head = nextTask;
             }
-        } else if (node.next == null) {
-            Node<Task> prevTask = node.prev;
-            prevTask.next = null;
+        } else if (node.getNext() == null) {
+            Node<Task> prevTask = node.getPrev();
+            prevTask.setNext(null);
             tail = prevTask;
         } else {
-            Node<Task> prevTask = node.prev;
-            Node<Task> nextTask = node.next;
-            prevTask.next = nextTask;
-            nextTask.prev = prevTask;
+            Node<Task> prevTask = node.getPrev();
+            Node<Task> nextTask = node.getNext();
+            prevTask.setNext(nextTask);
+            nextTask.setPrev(prevTask);
         }
-        node = null;
         size--;
     }
 
@@ -97,16 +91,14 @@ public class InMemoryHistoryManager implements HistoryManager {
         ArrayList<Task> utilList = new ArrayList<>();
 
         if (head == null) {
-            return null;
+            return utilList;
         }
         Node<Task> task = head;
-        utilList.add(task.value);
-        for (int i = 1; i < size(); i++) {
-            if (task.next != null) {
-                Node<Task> nextTask = task.next;
-                utilList.add(nextTask.value);
-                task = nextTask;
-            }
+        utilList.add(task.getValue());
+        while (task.getNext() != null) {
+            Node<Task> nextTask = task.getNext();
+            utilList.add(nextTask.getValue());
+            task = nextTask;
         }
         return utilList;
     }
