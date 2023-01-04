@@ -36,20 +36,16 @@ public class InMemoryTaskManager implements TaskManager {
     //обработка входящей задачи
     @Override
     public void manageTaskObject(Task object) {
-        while (taskMap.containsKey(id)) {
+        //подкрутка id
+        while (taskMap.containsKey(id) && epicTaskMap.containsKey(id) && epicSubTaskIdMap.containsKey(id)) {
             id++;
         }
-        while (epicTaskMap.containsKey(id)) {
-            id++;
-        }
-        while (epicSubTaskIdMap.containsKey(id)) {
-            id++;
-        }
+        //присвоить id
         if (object.getTaskId() == null) {
             object.setTaskId(id);
             id = id + 1;
         }
-
+        //дата
         if (object.getTaskCreateDate() == null) {
             object.setTaskCreateDate(Calendar.getInstance());
             object.setTaskUpdateDate(Calendar.getInstance());
@@ -57,13 +53,13 @@ public class InMemoryTaskManager implements TaskManager {
         //условие для создания эпика
         if (object instanceof EpicTask) {
             manageEpicTask((EpicTask) object);
-            //условие для создания подзадачи
+        //условие для создания подзадачи
         } else if (object instanceof SubTask) {
             if (object.getTaskStatus() == null) {
                 object.setTaskStatus(StatusType.NEW);
             }
             manageSubTask((SubTask) object);
-            //условие для создания задачи
+        //условие для создания задачи
         } else {
             if (object.getTaskStatus() == null) {
                 object.setTaskStatus(StatusType.NEW);
@@ -195,13 +191,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getAllTypesTasks() {
         ArrayList<Task> allTasksList = new ArrayList<>();
-        if (getAllTasks()!=null) {
+        if (getAllTasks() != null) {
             allTasksList.addAll(getAllTasks());
         }
-        if (getAllEpicTasks()!=null) {
+        if (getAllEpicTasks() != null) {
             allTasksList.addAll(getAllEpicTasks());
         }
-        if (getAllSubTasks()!=null) {
+        if (getAllSubTasks() != null) {
             allTasksList.addAll(getAllSubTasks());
         }
 
