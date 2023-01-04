@@ -49,6 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
             object.setTaskId(id);
             id = id + 1;
         }
+
         if (object.getTaskCreateDate() == null) {
             object.setTaskCreateDate(Calendar.getInstance());
             object.setTaskUpdateDate(Calendar.getInstance());
@@ -58,9 +59,15 @@ public class InMemoryTaskManager implements TaskManager {
             manageEpicTask((EpicTask) object);
             //условие для создания подзадачи
         } else if (object instanceof SubTask) {
+            if (object.getTaskStatus() == null) {
+                object.setTaskStatus(StatusType.NEW);
+            }
             manageSubTask((SubTask) object);
             //условие для создания задачи
         } else {
+            if (object.getTaskStatus() == null) {
+                object.setTaskStatus(StatusType.NEW);
+            }
             manageTask(object);
         }
     }
@@ -80,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
             EpicTask object = epicTaskMap.get(taskId);
             object.setTaskName(epicObject.getTaskName());
             object.setTaskDescription(epicObject.getTaskDescription());
-            object.setTaskStatus(epicObject.epicStatusType());
+            object.setTaskStatus(object.epicStatusType());
 
             if (object.getTaskStatus() == StatusType.DONE) {
                 object.setCloseDate(Calendar.getInstance());
@@ -102,9 +109,9 @@ public class InMemoryTaskManager implements TaskManager {
 
             if (!epicObject.getSubTaskMap().containsKey(taskId)) {
 
-                subObject.setTaskStatus(StatusType.NEW);
                 epicObject.getSubTaskMap().put(taskId, subObject);
                 epicSubTaskIdMap.put(taskId, epicTaskId);
+                epicObject.setTaskStatus(epicObject.epicStatusType());
 
             } else {
 
@@ -130,7 +137,6 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!taskMap.containsKey(taskId)) {
 
-            taskObject.setTaskStatus(StatusType.NEW);
             taskMap.put(taskId, taskObject);
 
         } else {
