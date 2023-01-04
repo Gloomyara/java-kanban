@@ -1,6 +1,7 @@
 package ru.mikhailantonov.taskmanager.task;
 
 import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,6 +14,8 @@ import java.util.HashMap;
 public class EpicTask extends Task {
 
     private final HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
+
+    private final TaskType taskType = TaskType.EPIC;
 
     public EpicTask(String taskName, String taskDescription) {
         super(taskName, taskDescription);
@@ -47,13 +50,10 @@ public class EpicTask extends Task {
         return status;
     }
 
+    //id,type,name,status,description,epic
     @Override
     public String toString() {
-        String result = "{ID: " + taskId + "; Эпик: " + taskName + "; " + taskStatus;
-        /*if (subTaskMap != null) {
-            result = result + "\n Подзадачи: " + subTaskMap.values();
-        }*/
-        return result + "}\n";
+        return taskId + "," + taskType + "," + taskName + "," + taskStatus.getStatusName() + "," + taskDescription;
     }
 
     public HashMap<Integer, SubTask> getSubTaskMap() {

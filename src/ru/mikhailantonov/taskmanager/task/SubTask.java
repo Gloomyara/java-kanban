@@ -1,6 +1,7 @@
 package ru.mikhailantonov.taskmanager.task;
 
 import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.util.TaskType;
 
 /**
  * Класс для объектов подзадач
@@ -8,9 +9,10 @@ import ru.mikhailantonov.taskmanager.util.StatusType;
 
 public class SubTask extends Task {
     private int epicTaskId;
+    private final TaskType taskType = TaskType.SUBTASK;
 
-    public SubTask(int epicTaskId, String taskName, String taskDescription, StatusType taskStatus) {
-        super(taskName, taskDescription, taskStatus);
+    public SubTask(String taskName,StatusType taskStatus, String taskDescription, int epicTaskId) {
+        super(taskName,taskStatus, taskDescription);
         this.epicTaskId = epicTaskId;
     }
 
@@ -22,8 +24,9 @@ public class SubTask extends Task {
         this.epicTaskId = epicTaskId;
     }
 
+    //id,type,name,status,description,epic
     @Override
     public String toString() {
-        return "{ID: " + taskId + "; Подзадача: " + taskName + "; " + taskStatus + "}\n";
+        return taskId + "," + taskType + "," + taskName + "," + taskStatus.getStatusName() + "," + taskDescription + "," + epicTaskId;
     }
 }

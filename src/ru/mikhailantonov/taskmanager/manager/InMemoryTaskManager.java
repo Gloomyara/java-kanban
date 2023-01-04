@@ -15,12 +15,12 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
     int id = 1; //нужно для тестов
-    private final HashMap<Integer, Task> taskMap = new HashMap<>();
-    private final HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
-    private final HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
-    private ArrayList<Task> tasksList;
+    protected final HashMap<Integer, Task> taskMap = new HashMap<>();
+    protected final HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
+    protected final HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
+    protected ArrayList<Task> tasksList;
 
     //вернуть историю просмотров
     @Override
@@ -36,11 +36,23 @@ public class InMemoryTaskManager implements TaskManager {
     //обработка входящей задачи
     @Override
     public void manageTaskObject(Task object) {
-
+        while (taskMap.containsKey(id)) {
+            id++;
+        }
+        while (epicTaskMap.containsKey(id)) {
+            id++;
+        }
+        while (epicSubTaskIdMap.containsKey(id)) {
+            id++;
+        }
         if (object.getTaskId() == null) {
             object.setTaskId(id);
+            id = id + 1;
         }
-
+        if (object.getTaskCreateDate() == null) {
+            object.setTaskCreateDate(Calendar.getInstance());
+            object.setTaskUpdateDate(Calendar.getInstance());
+        }
         //условие для создания эпика
         if (object instanceof EpicTask) {
             manageEpicTask((EpicTask) object);
@@ -61,10 +73,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epicTaskMap.containsKey(taskId)) {
 
             epicObject.setTaskStatus(epicObject.epicStatusType());
-            epicObject.setTaskCreateDate(Calendar.getInstance());
-            epicObject.setTaskUpdateDate(Calendar.getInstance());
             epicTaskMap.put(taskId, epicObject);
-            id = id + 1;
+
         } else {
 
             EpicTask object = epicTaskMap.get(taskId);
@@ -93,11 +103,9 @@ public class InMemoryTaskManager implements TaskManager {
             if (!epicObject.getSubTaskMap().containsKey(taskId)) {
 
                 subObject.setTaskStatus(StatusType.NEW);
-                subObject.setTaskCreateDate(Calendar.getInstance());
-                subObject.setTaskUpdateDate(Calendar.getInstance());
                 epicObject.getSubTaskMap().put(taskId, subObject);
                 epicSubTaskIdMap.put(taskId, epicTaskId);
-                id = id + 1;
+
             } else {
 
                 SubTask object = epicObject.getSubTaskMap().get(taskId);
@@ -123,10 +131,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (!taskMap.containsKey(taskId)) {
 
             taskObject.setTaskStatus(StatusType.NEW);
-            taskObject.setTaskCreateDate(Calendar.getInstance());
-            taskObject.setTaskUpdateDate(Calendar.getInstance());
             taskMap.put(taskId, taskObject);
-            id = id + 1;
+
         } else {
 
             Task object = taskMap.get(taskId);
@@ -183,10 +189,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getAllTypesTasks() {
         ArrayList<Task> allTasksList = new ArrayList<>();
-
-        allTasksList.addAll(getAllTasks());
-        allTasksList.addAll(getAllEpicTasks());
-        allTasksList.addAll(getAllSubTasks());
+        if (getAllTasks()!=null) {
+            allTasksList.addAll(getAllTasks());
+        }
+        if (getAllEpicTasks()!=null) {
+            allTasksList.addAll(getAllEpicTasks());
+        }
+        if (getAllSubTasks()!=null) {
+            allTasksList.addAll(getAllSubTasks());
+        }
 
         return allTasksList;
     }

@@ -19,7 +19,17 @@ public enum StatusType {
     public String getStatusName() {
         return statusName;
     }
-
+    public static StatusType stringToStatus(String str){
+        switch (str) {
+            case "Открыт":
+                return NEW;
+            case "В работе":
+                return IN_PROGRESS;
+            case "Закрыт":
+                return DONE;
+        }
+        return null;
+    }
     @Override
     public String toString() {
         return "Статус задачи: " + statusName;

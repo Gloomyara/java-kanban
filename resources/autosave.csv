@@ -1,0 +1,6 @@
+id,type,name,status,description,epic
+2,Задача,Задача2,Открыт,fdsa
+6,Эпик,ЭпикЗадача2,Открыт,fsgnbdfg
+7,Подзадача,Э2 ПодЗадача1,Открыт,asdfsa,6
+
+

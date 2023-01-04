@@ -1,6 +1,7 @@
 package ru.mikhailantonov.taskmanager.task;
 
 import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.util.Calendar;
 
@@ -17,6 +18,8 @@ public class Task {
     protected Calendar taskUpdateDate;
     protected Calendar taskCloseDate = null;
 
+    private final TaskType taskType = TaskType.TASK;
+
     public Task(String taskName, String taskDescription) {
 
         this.taskName = taskName;
@@ -24,13 +27,17 @@ public class Task {
 
     }
 
-    public Task(String taskName, String taskDescription, StatusType taskStatus) {
+    public Task(String taskName, StatusType taskStatus, String taskDescription) {
 
         this.taskName = taskName;
-        this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+        this.taskDescription = taskDescription;
+
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
     public void setTaskName(String taskName) {
         this.taskName = taskName;
     }
@@ -88,8 +95,9 @@ public class Task {
         this.taskStatus = statusType;
     }
 
+    //id,type,name,status,description,epic
     @Override
     public String toString() {
-        return "{ID: " + taskId + "; Задача: " + taskName + "; " + taskStatus + "}\n";
+        return taskId + "," + taskType + "," + taskName + "," + taskStatus.getStatusName() + "," + taskDescription;
     }
 }
