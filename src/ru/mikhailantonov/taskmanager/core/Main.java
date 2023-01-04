@@ -12,13 +12,15 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        //создаем и считываем
+        //считываем
         TaskManager taskManager = Managers.getDefault();
         //проверка истории
-        System.out.println("История: ***" + taskManager.getHistory() + "***");
+        System.out.println("Проверка истории: ***" + taskManager.getHistory() + "***");
         //проверка мап
-        System.out.println(taskManager.getAllTypesTasks());
-        /*
+        System.out.println("Проверка мап : " + taskManager.getAllTypesTasks());
+        System.out.println("Такой себе сценарий");
+        System.out.println();
+
         //создать 8 задач
         Task taskObject1 = new Task("Задача1", StatusType.NEW,"adsf");
         Task taskObject2 = new Task("Задача2", StatusType.NEW,"fdsa");
@@ -83,6 +85,6 @@ public class Main {
         taskManager.deleteTaskById(3);
         taskManager.deleteTaskById(4);
         System.out.println("История: ***" + taskManager.getHistory() + "***");
-*/
+
     }
 }

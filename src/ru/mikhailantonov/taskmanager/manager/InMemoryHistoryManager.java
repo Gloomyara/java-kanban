@@ -70,19 +70,15 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (node.getPrev() == null) {
             if (node.getNext() != null) {
-                Node<Task> nextTask = node.getNext();
-                nextTask.setPrev(null);
-                head = nextTask;
+                node.getNext().setPrev(null);
+                head = node.getNext();
             }
         } else if (node.getNext() == null) {
-            Node<Task> prevTask = node.getPrev();
-            prevTask.setNext(null);
-            tail = prevTask;
+            node.getPrev().setNext(null);
+            tail = node.getPrev();
         } else {
-            Node<Task> prevTask = node.getPrev();
-            Node<Task> nextTask = node.getNext();
-            prevTask.setNext(nextTask);
-            nextTask.setPrev(prevTask);
+            node.getPrev().setNext(node.getNext());
+            node.getNext().setPrev(node.getPrev());
         }
         size--;
     }
@@ -96,9 +92,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node<Task> task = head;
         utilList.add(task.getValue());
         while (task.getNext() != null) {
-            Node<Task> nextTask = task.getNext();
-            utilList.add(nextTask.getValue());
-            task = nextTask;
+            task = task.getNext();
+            utilList.add(task.getValue());
         }
         return utilList;
     }
