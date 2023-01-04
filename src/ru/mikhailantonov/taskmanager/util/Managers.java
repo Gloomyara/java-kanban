@@ -13,7 +13,7 @@ public class Managers {
 
     public static TaskManager getDefault() {
         if (t == null) {
-            t = new InMemoryTaskManager();
+            t = new FileBackedTasksManager();
         }
         return t;
     }

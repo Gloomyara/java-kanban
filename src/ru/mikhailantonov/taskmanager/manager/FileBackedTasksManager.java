@@ -27,7 +27,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 manageTaskObject(taskFromString(list.get(i)));
                 i++;
             }
-            for (int taskId : historyFromString(list.get(i + 1))) {
+            i++;
+            for (int taskId : historyFromString(list.get(i))) {
                 getTaskObjectById(taskId);
             }
         } catch (IOException e) {

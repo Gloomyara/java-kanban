@@ -12,16 +12,22 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
+        //создаем и считываем
         TaskManager taskManager = Managers.getDefault();
-        //создать 7 задач
-        Task taskObject1 = new Task("Задача1", "adsf", StatusType.NEW);
-        Task taskObject2 = new Task("Задача2", "fdsa", StatusType.NEW);
+        //проверка истории
+        System.out.println("История: ***" + taskManager.getHistory() + "***");
+        //проверка мап
+        System.out.println(taskManager.getAllTypesTasks());
+        /*
+        //создать 8 задач
+        Task taskObject1 = new Task("Задача1", StatusType.NEW,"adsf");
+        Task taskObject2 = new Task("Задача2", StatusType.NEW,"fdsa");
         Task taskObject3 = new EpicTask("ЭпикЗадача1", "fddadsf");
-        Task taskObject4 = new SubTask(3, "Э1 ПодЗадача1", "asdfsa", StatusType.NEW);
-        Task taskObject5 = new SubTask(3, "Э1 ПодЗадача2", "fdfasdf", StatusType.NEW);
+        Task taskObject4 = new SubTask("Э1 ПодЗадача1", StatusType.NEW,"asdfsa",3);
+        Task taskObject5 = new SubTask("Э1 ПодЗадача2", StatusType.NEW,"fdfasdf",3);
         Task taskObject6 = new EpicTask("ЭпикЗадача2", "fsgnbdfg");
-        Task taskObject7 = new SubTask(6, "Э2 ПодЗадача1", "asdfsa", StatusType.NEW);
-        Task taskObject8 = new SubTask(3, "Э1 ПодЗадача3", "fdfxx", StatusType.NEW);
+        Task taskObject7 = new SubTask("Э2 ПодЗадача1", StatusType.NEW, "asdfsa", 6);
+        Task taskObject8 = new SubTask( "Э1 ПодЗадача3", StatusType.NEW,"fdfxx", 3);
         //распределить по типу
         taskManager.manageTaskObject(taskObject1);
         taskManager.manageTaskObject(taskObject2);
@@ -77,14 +83,6 @@ public class Main {
         taskManager.deleteTaskById(3);
         taskManager.deleteTaskById(4);
         System.out.println("История: ***" + taskManager.getHistory() + "***");
-        //печать всех задач
-        System.out.println(taskManager.getAllTypesTasks());
-
-        taskManager.deleteAllTasks();
-        System.out.println("История: ***" + taskManager.getHistory() + "***");
-        taskManager.deleteAllSubTasks();
-        System.out.println("История: ***" + taskManager.getHistory() + "***");
-        taskManager.deleteAllEpicTasks();
-        taskManager.getHistory();
+*/
     }
 }
