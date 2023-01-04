@@ -210,7 +210,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (!taskMap.isEmpty()) {
             tasksList.addAll(taskMap.values());
         } else {
-            System.out.println("Ошибка! не найдено задач!");
             return null;
         }
         return tasksList;
@@ -224,7 +223,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epicTaskMap.isEmpty()) {
             tasksList.addAll(epicTaskMap.values());
         } else {
-            System.out.println("Ошибка! не найдено эпиков!");
             return null;
         }
         return tasksList;
@@ -255,12 +253,9 @@ public class InMemoryTaskManager implements TaskManager {
             for (EpicTask epicObject : epicTaskMap.values()) {
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     tasksList.addAll(epicObject.getSubTaskMap().values());
-                } else {
-                    System.out.println("У эпика: " + epicObject.getTaskName() + " нет подзадач");
                 }
             }
         } else {
-            System.out.println("Нет подзадач");
             return null;
         }
         return tasksList;
