@@ -31,7 +31,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             for (int taskId : historyFromString(list.get(i))) {
                 getTaskObjectById(taskId);
             }
-            save();
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Произошла ошибка во время чтения файла.");
@@ -60,6 +59,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             System.out.println(e.getMessage());
         }
     }
+
 
     public Task taskFromString(String value) {
         String[] line = value.split(",");
@@ -101,6 +101,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             tasksId.add(Integer.parseInt(str));
         }
         return tasksId;
+    }
+    @Override
+    public List<Task> getHistory(){
+        save();
+        return super.getHistory();
     }
 
     @Override
