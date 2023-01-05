@@ -51,14 +51,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         TaskIdComparator taskIdComparator = new TaskIdComparator();
         tasks.sort(taskIdComparator);
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("resources/autosave.csv", StandardCharsets.UTF_8))) {
-            bufferedWriter.write("id,type,name,status,description,epic\n");
+            bufferedWriter.write("id,type,name,status,description,epic");
+            bufferedWriter.newLine();
             for (Task task : tasks) {
-                bufferedWriter.append(task.toString());
+                bufferedWriter.write(task.toString());
                 bufferedWriter.newLine();
             }
 
             bufferedWriter.newLine();
-            bufferedWriter.append(historyToString(historyManager));
+            bufferedWriter.write(historyToString(historyManager));
         } catch (IOException e) {
             e.printStackTrace();
             throw new ManagerSaveException("Произошла ошибка во время записи файла.");
