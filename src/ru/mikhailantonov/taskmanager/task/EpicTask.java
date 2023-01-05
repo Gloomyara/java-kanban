@@ -53,7 +53,7 @@ public class EpicTask extends Task {
     //id,type,name,status,description,epic
     @Override
     public String toString() {
-        return taskId + "," + taskType + "," + taskName + "," + taskStatus.getStatusName() + "," + taskDescription;
+        return taskId + "," + taskType.getTaskTypeName() + "," + taskName + "," + taskStatus.getStatusName() + "," + taskDescription;
     }
 
     public HashMap<Integer, SubTask> getSubTaskMap() {

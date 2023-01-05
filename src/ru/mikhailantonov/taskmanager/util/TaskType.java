@@ -10,18 +10,18 @@ public enum TaskType {
     EPIC("Эпик"),
     SUBTASK("Подзадача");
 
-    private final String statusName;
+    private final String taskTypeName;
 
-    TaskType(String statusName) {
-        this.statusName = statusName;
+    TaskType(String taskTypeName) {
+        this.taskTypeName = taskTypeName;
     }
 
-    public String getStatusName() {
-        return statusName;
+    public String getTaskTypeName() {
+        return taskTypeName;
     }
 
     @Override
     public String toString() {
-        return statusName;
+        return "Тип задачи: " + taskTypeName;
     }
 }
