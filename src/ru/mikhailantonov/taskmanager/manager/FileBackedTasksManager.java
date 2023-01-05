@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Класс для обработки и хранения объектов задач в файле и/или создания задач из файла
@@ -50,16 +51,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("resources/autosave.csv", StandardCharsets.UTF_8))) {
             bufferedWriter.write("id,type,name,status,description,epic\n");
             for (Task task : tasks) {
-                bufferedWriter.write(task.toString() + "\n");
+                bufferedWriter.append(task.toString());
+                bufferedWriter.newLine();
             }
 
             bufferedWriter.newLine();
-            bufferedWriter.write(historyToString(historyManager) + "\n");
+            bufferedWriter.append(historyToString(historyManager));
         } catch (IOException e) {
             e.printStackTrace();
             throw new ManagerSaveException("Произошла ошибка во время записи файла.");
-        } catch (ManagerSaveException e) {
-            System.out.println(e.getMessage());
         }
     }
 
@@ -68,18 +68,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         String[] line = value.split(",");
         //id,type,name,status,description,epic
         switch (line[1]) {
-            case "Задача": {
+            case "TASK": {
                 Task task = new Task(line[2], StatusType.stringToStatus(line[3]), line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
             }
-            case "Эпик": {
+            case "EPIC": {
                 Task task = new EpicTask(line[2], line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
                 task.setTaskStatus(StatusType.stringToStatus(line[3]));
                 return task;
             }
-            case "Подзадача": {
+            case "SUBTASK": {
                 Task task = new SubTask(line[2], StatusType.stringToStatus(line[3]), line[4], Integer.parseInt(line[5]));
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
@@ -90,12 +90,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     //сохранить историю в строке
     static String historyToString(HistoryManager manager) {
-        var tasksHistory = manager.getHistory();
-        List<String> stringHistory = new ArrayList<>();
-        for (Task task : tasksHistory) {
-            stringHistory.add(task.getTaskId().toString());
+
+        StringJoiner stringJoiner = new StringJoiner(",");
+        for (Task task : manager.getHistory()) {
+            stringJoiner.add(task.getTaskId().toString());
         }
-        return String.join(",", stringHistory);
+        return stringJoiner.toString();
     }
 
     //восстановить историю
@@ -109,9 +109,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public List<Task> getHistory() {
-        save();
-        return super.getHistory();
+    public Task getTaskObjectById(int taskId) {
+    Task task = super.getTaskObjectById(taskId);
+    save();
+    return task;
     }
 
     @Override

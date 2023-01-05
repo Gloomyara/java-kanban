@@ -6,9 +6,9 @@ package ru.mikhailantonov.taskmanager.util;
 
 public enum StatusType {
     //Перечисляем варианты состояний задачи и их названия
-    NEW("Открыт"),
-    IN_PROGRESS("В работе"),
-    DONE("Закрыт");
+    NEW("NEW"),
+    IN_PROGRESS("IN_PROGRESS"),
+    DONE("DONE");
 
     private final String statusName;
 
@@ -21,11 +21,11 @@ public enum StatusType {
     }
     public static StatusType stringToStatus(String str){
         switch (str) {
-            case "Открыт":
+            case "NEW":
                 return NEW;
-            case "В работе":
+            case "IN_PROGRESS":
                 return IN_PROGRESS;
-            case "Закрыт":
+            case "DONE":
                 return DONE;
         }
         return null;
