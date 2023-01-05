@@ -8,6 +8,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс для обработки и хранения объектов задач в файле и/или создания задач из файла
+ */
+
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
 
     //считываем таски
@@ -15,6 +19,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         load("resources/autosave.csv");
     }
 
+    //чтение файла задач и истории
     public void load(String filePath) {
         List<String> list = new ArrayList<>();
         try (BufferedReader fileReader = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8))) {
@@ -31,15 +36,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             for (int taskId : historyFromString(list.get(i))) {
                 getTaskObjectById(taskId);
             }
-        } catch (IOException e) {
+        } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
             System.out.println("Произошла ошибка во время чтения файла.");
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            System.out.println("Произошла ошибка во время чтения файла. Нет данных о истории просмотров");
         }
     }
 
+    //Сохранить задачи и историю просмотров в файл
     private void save() {
         var tasks = getAllTypesTasks();
         TaskIdComparator taskIdComparator = new TaskIdComparator();
@@ -60,8 +63,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
     }
 
-
-    public Task taskFromString(String value) {
+    //создание задачи по данным из строки
+    public Task taskFromString(String value) throws NumberFormatException {
         String[] line = value.split(",");
         //id,type,name,status,description,epic
         switch (line[1]) {
@@ -85,6 +88,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return null;
     }
 
+    //сохранить историю в строке
     static String historyToString(HistoryManager manager) {
         var tasksHistory = manager.getHistory();
         List<String> stringHistory = new ArrayList<>();
@@ -94,6 +98,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return String.join(",", stringHistory);
     }
 
+    //восстановить историю
     static List<Integer> historyFromString(String value) throws NumberFormatException {
         String[] line = value.split(",");
         List<Integer> tasksId = new ArrayList<>();
@@ -102,8 +107,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         }
         return tasksId;
     }
+
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         save();
         return super.getHistory();
     }

@@ -16,7 +16,7 @@ import java.util.List;
 public class InMemoryTaskManager implements TaskManager {
 
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-    int id = 1; //нужно для тестов
+    protected int id = 1; //нужно для тестов
     protected final HashMap<Integer, Task> taskMap = new HashMap<>();
     protected final HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
     protected final HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
@@ -36,12 +36,13 @@ public class InMemoryTaskManager implements TaskManager {
     //обработка входящей задачи
     @Override
     public void manageTaskObject(Task object) {
-        //подкрутка id
+
+        //присвоить id
+        if (object.getTaskId() == null) {
+            //подкрутка id
         /*while (taskMap.containsKey(id) || epicTaskMap.containsKey(id) || epicSubTaskIdMap.containsKey(id)) {
             id++;
         }*/
-        //присвоить id
-        if (object.getTaskId() == null) {
             object.setTaskId(id);
             id = id + 1;
         }
@@ -53,13 +54,13 @@ public class InMemoryTaskManager implements TaskManager {
         //условие для создания эпика
         if (object instanceof EpicTask) {
             manageEpicTask((EpicTask) object);
-        //условие для создания подзадачи
+            //условие для создания подзадачи
         } else if (object instanceof SubTask) {
             if (object.getTaskStatus() == null) {
                 object.setTaskStatus(StatusType.NEW);
             }
             manageSubTask((SubTask) object);
-        //условие для создания задачи
+            //условие для создания задачи
         } else {
             if (object.getTaskStatus() == null) {
                 object.setTaskStatus(StatusType.NEW);
@@ -280,6 +281,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean deleteTask(int taskId) {
+        if (id > taskId) id = taskId;
         taskMap.remove(taskId);
         historyManager.remove(taskId);
         System.out.println("Задача под номером: " + taskId + " удалена.");
@@ -288,6 +290,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean deleteEpicTask(int taskId) {
+        if (id > taskId) id = taskId;
         EpicTask epicObject = epicTaskMap.get(taskId);
         for (Task task : epicObject.getSubTaskMap().values()) {
             historyManager.remove(task.getTaskId());
@@ -301,6 +304,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean deleteSubTask(int taskId) {
+        if (id > taskId) id = taskId;
         int epicTaskId = epicSubTaskIdMap.get(taskId);
         EpicTask epicObject = epicTaskMap.get(epicTaskId);
         epicObject.getSubTaskMap().remove(taskId);
@@ -333,9 +337,11 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (!epicTaskMap.isEmpty()) {
             for (EpicTask epicObject : epicTaskMap.values()) {
+                if (id > epicObject.getTaskId()) id = epicObject.getTaskId();
                 for (Task task : epicObject.getSubTaskMap().values()) {
                     if (!epicObject.getSubTaskMap().isEmpty()) {
                         historyManager.remove(task.getTaskId());
+                        if (id > task.getTaskId()) id = task.getTaskId();
                     }
                 }
                 historyManager.remove(epicObject.getTaskId());
@@ -359,6 +365,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (EpicTask epicObject : epicTaskMap.values()) {
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     for (Task task : epicObject.getSubTaskMap().values()) {
+                        if (id > task.getTaskId()) id = task.getTaskId();
                         historyManager.remove(task.getTaskId());
                     }
                     epicObject.getSubTaskMap().clear();
