@@ -37,9 +37,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void manageTaskObject(Task object) {
         //подкрутка id
-        while (taskMap.containsKey(id) && epicTaskMap.containsKey(id) && epicSubTaskIdMap.containsKey(id)) {
+        /*while (taskMap.containsKey(id) || epicTaskMap.containsKey(id) || epicSubTaskIdMap.containsKey(id)) {
             id++;
-        }
+        }*/
         //присвоить id
         if (object.getTaskId() == null) {
             object.setTaskId(id);
