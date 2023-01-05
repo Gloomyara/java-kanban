@@ -19,7 +19,8 @@ public enum StatusType {
     public String getStatusName() {
         return statusName;
     }
-    public static StatusType stringToStatus(String str){
+
+    public static StatusType stringToStatus(String str) {
         switch (str) {
             case "NEW":
                 return NEW;
@@ -30,6 +31,7 @@ public enum StatusType {
         }
         return null;
     }
+
     @Override
     public String toString() {
         return "Статус задачи: " + statusName;

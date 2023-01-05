@@ -40,6 +40,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
             System.out.println("Произошла ошибка во время чтения файла.");
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
@@ -110,9 +112,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     @Override
     public Task getTaskObjectById(int taskId) {
-    Task task = super.getTaskObjectById(taskId);
-    save();
-    return task;
+        Task task = super.getTaskObjectById(taskId);
+        save();
+        return task;
     }
 
     @Override
