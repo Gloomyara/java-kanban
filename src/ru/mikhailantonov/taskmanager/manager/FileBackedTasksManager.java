@@ -51,8 +51,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         TaskIdComparator taskIdComparator = new TaskIdComparator();
         tasks.sort(taskIdComparator);
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("resources/autosave.csv", StandardCharsets.UTF_8))) {
-            bufferedWriter.write("id,type,name,status,description,epic");
+
+            bufferedWriter.write("id,type,name,status,description,epicId");
             bufferedWriter.newLine();
+
             for (Task task : tasks) {
                 bufferedWriter.write(task.toString());
                 bufferedWriter.newLine();
@@ -70,25 +72,26 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public Task taskFromString(String value) throws NumberFormatException {
         String[] line = value.split(",");
         //id,type,name,status,description,epic
-        switch (line[1]) {
-            case "TASK": {
-                Task task = new Task(line[2], StatusType.stringToStatus(line[3]), line[4]);
+        switch (TaskType.valueOf(line[1])) {
+            case TASK: {
+                Task task = new Task(line[2], StatusType.valueOf(line[3]), line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
             }
-            case "EPIC": {
+            case EPIC: {
                 Task task = new EpicTask(line[2], line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
-                task.setTaskStatus(StatusType.stringToStatus(line[3]));
+                task.setTaskStatus(StatusType.valueOf(line[3]));
                 return task;
             }
-            case "SUBTASK": {
-                Task task = new SubTask(line[2], StatusType.stringToStatus(line[3]), line[4], Integer.parseInt(line[5]));
+            case SUBTASK: {
+                Task task = new SubTask(line[2], StatusType.valueOf(line[3]), line[4], Integer.parseInt(line[5]));
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
             }
+            default:
+                return null;
         }
-        return null;
     }
 
     //сохранить историю в строке

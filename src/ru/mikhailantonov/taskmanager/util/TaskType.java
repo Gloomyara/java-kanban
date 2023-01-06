@@ -6,9 +6,9 @@ package ru.mikhailantonov.taskmanager.util;
 
 public enum TaskType {
     //Перечисляем типы задач;
-    TASK("TASK"),
-    EPIC("EPIC"),
-    SUBTASK("SUBTASK");
+    TASK("Задача"),
+    EPIC("Эпик"),
+    SUBTASK("Подзадача");
 
     private final String taskTypeName;
 
