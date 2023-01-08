@@ -5,6 +5,7 @@ import ru.mikhailantonov.taskmanager.util.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -16,8 +17,8 @@ import java.util.StringJoiner;
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
 
     //считываем таски
-    public FileBackedTasksManager() {
-        load("resources/autosave.csv");
+    public FileBackedTasksManager(Path file) {
+        load(file.toString());
     }
 
     //чтение файла задач и истории

@@ -1,6 +1,6 @@
 id,type,name,status,description,epicId
-2,Задача,Задача2,Закрыт,fdsa
-6,Эпик,ЭпикЗадача2,Закрыт,fsgnbdfg
-7,Подзадача,Э2 ПодЗадача1,Закрыт,asdfsa,6
+2,TASK,Задача2,DONE,fdsa
+6,EPIC,ЭпикЗадача2,DONE,fsgnbdfg
+7,SUBTASK,Э2 ПодЗадача1,DONE,asdfsa,6
 
 2,7,6
