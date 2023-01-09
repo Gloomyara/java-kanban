@@ -15,9 +15,9 @@ public class Managers {
 
     public static TaskManager getDefault() {
         if (t == null) {
+            //t = new InMemoryTaskManager();
             try {
-                t = new FileBackedTasksManager(FileManager.createFile("autosave.csv"));
-                //t = new InMemoryTaskManager();
+                t = FileBackedTasksManager.loadFromFile(FileManager.createFile("autosave.csv").toFile());
             } catch (IOException e){
                 e.printStackTrace();
             }

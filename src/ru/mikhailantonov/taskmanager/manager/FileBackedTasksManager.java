@@ -5,7 +5,6 @@ import ru.mikhailantonov.taskmanager.util.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -15,28 +14,27 @@ import java.util.StringJoiner;
  */
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
-
     //считываем таски
-    public FileBackedTasksManager(Path file) {
-        load(file.toString());
+    public FileBackedTasksManager() {
     }
 
     //чтение файла задач и истории
-    public void load(String filePath) {
+    public static FileBackedTasksManager loadFromFile(File file) {
         List<String> list = new ArrayList<>();
-        try (BufferedReader fileReader = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8))) {
+        FileBackedTasksManager ftm = new FileBackedTasksManager();
+        try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             while (fileReader.ready()) {
                 String line = fileReader.readLine();
                 list.add(line);
             }
             int i = 1;
             while (!list.get(i).isBlank()) {
-                manageTaskObject(taskFromString(list.get(i)));
+                ftm.manageTaskObject(ftm.taskFromString(list.get(i)));
                 i++;
             }
             i++;
             for (int taskId : historyFromString(list.get(i))) {
-                getTaskObjectById(taskId);
+                ftm.getTaskObjectById(taskId);
             }
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
@@ -44,6 +42,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
+        return ftm;
     }
 
     //Сохранить задачи и историю просмотров в файл
