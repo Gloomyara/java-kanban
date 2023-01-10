@@ -13,7 +13,8 @@ public class Main {
 
         try {
             //считываем
-            TaskManager taskManager = Managers.getDefault();
+            //TaskManager taskManager = Managers.getDefault();
+            TaskManager taskManager = Managers.getDefault(false, "autosave.csv");
             //проверка истории
             System.out.println("Проверка истории: ***" + taskManager.getHistory() + "***");
             //проверка мап

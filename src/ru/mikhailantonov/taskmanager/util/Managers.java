@@ -15,10 +15,20 @@ public class Managers {
 
     public static TaskManager getDefault() {
         if (t == null) {
-            //t = new InMemoryTaskManager();
+            t = new InMemoryTaskManager();
+        }
+        return t;
+    }
+
+    public static TaskManager getDefault(boolean isNew, String path) {
+        if (t == null) {
             try {
-                t = FileBackedTasksManager.loadFromFile(FileManager.createFile("autosave.csv").toFile());
-            } catch (IOException e){
+                if (!isNew) {
+                    t = FileBackedTasksManager.loadFromFile(FileManager.createFile(path).toFile());
+                } else {
+                    t = new FileBackedTasksManager(FileManager.createFile(path).toFile());
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

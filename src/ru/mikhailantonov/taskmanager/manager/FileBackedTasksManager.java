@@ -14,14 +14,16 @@ import java.util.StringJoiner;
  */
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+    private final File autoSave;
     //считываем таски
-    public FileBackedTasksManager() {
+    public FileBackedTasksManager(File file) {
+        this.autoSave = file;
     }
 
     //чтение файла задач и истории
     public static FileBackedTasksManager loadFromFile(File file) {
         List<String> list = new ArrayList<>();
-        FileBackedTasksManager ftm = new FileBackedTasksManager();
+        FileBackedTasksManager ftm = new FileBackedTasksManager(file);
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             while (fileReader.ready()) {
                 String line = fileReader.readLine();
@@ -50,7 +52,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         var tasks = getAllTypesTasks();
         TaskIdComparator taskIdComparator = new TaskIdComparator();
         tasks.sort(taskIdComparator);
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("resources/autosave.csv", StandardCharsets.UTF_8))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(autoSave, StandardCharsets.UTF_8))) {
 
             bufferedWriter.write("id,type,name,status,description,epicId");
             bufferedWriter.newLine();
@@ -74,18 +76,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         //id,type,name,status,description,epic
         switch (TaskType.valueOf(line[1])) {
             case TASK: {
-                Task task = new Task(line[2], StatusType.valueOf(line[3]), line[4]);
+                Task task = new Task(line[2], StatusType.fromString(line[3]), line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
             }
             case EPIC: {
                 Task task = new EpicTask(line[2], line[4]);
                 task.setTaskId(Integer.parseInt(line[0]));
-                task.setTaskStatus(StatusType.valueOf(line[3]));
+                task.setTaskStatus(StatusType.fromString(line[3]));
                 return task;
             }
             case SUBTASK: {
-                Task task = new SubTask(line[2], StatusType.valueOf(line[3]), line[4], Integer.parseInt(line[5]));
+                Task task = new SubTask(line[2], StatusType.fromString(line[3]), line[4], Integer.parseInt(line[5]));
                 task.setTaskId(Integer.parseInt(line[0]));
                 return task;
             }
