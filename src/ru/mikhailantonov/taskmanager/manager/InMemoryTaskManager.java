@@ -101,6 +101,7 @@ public class InMemoryTaskManager implements TaskManager {
 
             EpicTask epicTask = epicTaskMap.get(taskId);
             if (!epicTask.equals(epicObject)) {
+                /*
                 if (!epicTask.getSubTaskMap().equals(epicObject.getSubTaskMap())) {
                     deleteOneEpicSubTasks(taskId);
                     if (!epicObject.getSubTaskMap().isEmpty()) {
@@ -108,7 +109,7 @@ public class InMemoryTaskManager implements TaskManager {
                             manageSubTask(subTask);
                         }
                     }
-                }
+                }*/
                 epicTask.setTaskName(epicObject.getTaskName());
                 epicTask.setTaskDescription(epicObject.getTaskDescription());
             }
