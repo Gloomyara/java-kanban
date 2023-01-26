@@ -15,20 +15,20 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    void manageTaskObject(Task object) throws TimeStampsCrossingException;
+    void manageTaskObject(Task object);
 
-    void manageTask(Task taskObject) throws TimeStampsCrossingException;
+    void manageTask(Task taskObject);
 
-    void manageSubTask(SubTask subObject) throws TimeStampsCrossingException;
+    void manageSubTask(SubTask subObject);
 
-    void manageEpicTask(EpicTask epicObject) throws TimeStampsCrossingException;
+    void manageEpicTask(EpicTask epicObject);
 
     //получить задачу по ID
     Task getTaskObjectById(Integer taskId);
 
-    Task getTask(Integer taskId) throws NullPointerException;
+    Task getTask(Integer taskId);
 
-    Task getEpicTask(Integer taskId) throws NullPointerException;
+    Task getEpicTask(Integer taskId);
 
     Task getSubTask(Integer taskId);
 
@@ -53,7 +53,7 @@ public interface TaskManager {
 
     boolean deleteSubTask(Integer taskId);
 
-    boolean deleteOneEpicSubTasks(Integer epicTaskId) throws NoSuchElementException, NullPointerException;
+    boolean deleteOneEpicSubTasks(Integer epicTaskId);
 
     boolean deleteAllTasks();
 
