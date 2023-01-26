@@ -220,7 +220,7 @@ public class TimeMapManager {
                 //возврат старых меток
                 timeMap.putAll(timeMapAddTimeStamps(timeMap, taskOld));
                 System.out.println(e.getMessage());
-                return false;
+                throw new TimeStampsCrossingException(e.getMessage());
             }
         }
         return true;

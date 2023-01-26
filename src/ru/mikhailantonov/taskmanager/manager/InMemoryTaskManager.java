@@ -45,7 +45,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     //обработка входящей задачи
     @Override
-    public void manageTaskObject(Task object) {
+    public void manageTaskObject(Task object) throws NullPointerException, IllegalArgumentException
+                 ,TimeStampsCrossingException, NoSuchElementException {
         try {
             if (object == null) {
                 throw new NullPointerException("Ошибка при обработке задачи! Невозможно обработать пустой объект задачи");
@@ -77,7 +78,8 @@ public class InMemoryTaskManager implements TaskManager {
                         throw new IllegalArgumentException("Ошибка при обработке задачи");
                 }
             }
-        } catch (NullPointerException | IllegalArgumentException | TimeStampsCrossingException e) {
+        } catch (NullPointerException | IllegalArgumentException
+                 | TimeStampsCrossingException | NoSuchElementException e) {
             System.out.println(e.getMessage());
         }
     }

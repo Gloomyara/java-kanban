@@ -16,6 +16,7 @@ import java.util.StringJoiner;
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private final File autoSave;
+
     //считываем таски
     public FileBackedTasksManager(File file) {
         super();
@@ -23,7 +24,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     //чтение файла задач и истории
-    public static FileBackedTasksManager loadFromFile(File file){
+    public static FileBackedTasksManager loadFromFile(File file) {
         List<String> list = new ArrayList<>();
         FileBackedTasksManager ftm = new FileBackedTasksManager(file);
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -45,6 +46,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
             System.out.println("Произошла ошибка во время чтения файла.");
         } catch (NullPointerException e) {
             e.printStackTrace();
+        } catch (TimeStampsCrossingException e) {
+            System.out.println(e.getMessage());
         }
         return ftm;
     }
@@ -136,7 +139,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public void manageTaskObject(Task object) throws IllegalArgumentException {
+    public void manageTaskObject(Task object) throws IllegalArgumentException, TimeStampsCrossingException {
         super.manageTaskObject(object);
         save();
     }

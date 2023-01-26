@@ -15,7 +15,7 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    void manageTaskObject(Task object);
+    void manageTaskObject(Task object) throws TimeStampsCrossingException;
 
     void manageTask(Task taskObject) throws TimeStampsCrossingException;
 
