@@ -14,7 +14,7 @@ public class Main {
         try {
             //считываем
             //TaskManager taskManager = Managers.getDefault();
-            TaskManager taskManager = Managers.getDefault(false, "autosave.csv");
+            TaskManager taskManager = Managers.getDefault(true, "autosave.csv");
             //проверка истории
             System.out.println("Проверка истории: ***" + taskManager.getHistory() + "***");
             //проверка мап
@@ -82,9 +82,9 @@ public class Main {
                     + taskManager.getOneEpicSubTasks(3));
 
             //удаление 3х задач
-            taskManager.deleteTaskById(1);
-            taskManager.deleteTaskById(3);
-            taskManager.deleteTaskById(4);
+            taskManager.deleteTaskObjectById(1);
+            taskManager.deleteTaskObjectById(3);
+            taskManager.deleteTaskObjectById(4);
             System.out.println("История: ***" + taskManager.getHistory() + "***");
         } catch (ManagerSaveException e) {
             e.printStackTrace();

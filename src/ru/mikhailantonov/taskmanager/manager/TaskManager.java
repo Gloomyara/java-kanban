@@ -1,8 +1,11 @@
 package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
+import ru.mikhailantonov.taskmanager.util.TimeStampsCrossingException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 
 /**
  * Базовый интерфейс менеджеров по работе с задачами
@@ -14,37 +17,43 @@ public interface TaskManager {
 
     void manageTaskObject(Task object);
 
-    void manageTask(Task taskObject);
+    void manageTask(Task taskObject) throws TimeStampsCrossingException;
 
-    void manageSubTask(SubTask subObject);
+    void manageSubTask(SubTask subObject) throws TimeStampsCrossingException;
 
-    void manageEpicTask(EpicTask epicObject);
+    void manageEpicTask(EpicTask epicObject) throws TimeStampsCrossingException;
 
-    Task getTaskObjectById(int taskId);
+    //получить задачу по ID
+    Task getTaskObjectById(Integer taskId);
 
-    Task getTask(int taskId);
+    Task getTask(Integer taskId) throws NullPointerException;
 
-    Task getEpicTask(int taskId);
+    Task getEpicTask(Integer taskId) throws NullPointerException;
 
-    Task getSubTask(int taskId);
-
-    List<Task> getOneEpicSubTasks(int epicTaskId);
+    Task getSubTask(Integer taskId);
 
     List<Task> getAllTypesTasks();
+
+    TreeSet<Task> getPrioritizedTasks();
 
     List<Task> getAllTasks();
 
     List<Task> getAllEpicTasks();
 
+    //получить все подзадачи 1 эпика
+    List<Task> getOneEpicSubTasks(Integer epicTaskId);
+
     List<Task> getAllSubTasks();
 
-    boolean deleteTaskById(int taskId);
+    boolean deleteTaskObjectById(Integer taskId);
 
-    boolean deleteTask(int taskId);
+    boolean deleteTask(Integer taskId);
 
-    boolean deleteEpicTask(int taskId);
+    boolean deleteEpicTask(Integer taskId);
 
-    boolean deleteSubTask(int taskId);
+    boolean deleteSubTask(Integer taskId);
+
+    boolean deleteOneEpicSubTasks(Integer epicTaskId) throws NoSuchElementException, NullPointerException;
 
     boolean deleteAllTasks();
 

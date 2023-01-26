@@ -1,5 +1,9 @@
 package ru.mikhailantonov.taskmanager.util;
 
+/**
+ * Utility class для handmade linked-list в менеджере HistoryManager
+ * @param <E>
+ */
 public class Node<E> {
     private E value;
     private Node<E> next;

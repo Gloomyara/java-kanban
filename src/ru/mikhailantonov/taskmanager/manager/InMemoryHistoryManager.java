@@ -45,7 +45,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory() {
+    public List<Task> getHistory() throws NullPointerException {
         return getTasks();
     }
 
@@ -83,11 +83,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         size--;
     }
 
-    private ArrayList<Task> getTasks() {
+    private ArrayList<Task> getTasks() throws NullPointerException {
         ArrayList<Task> utilList = new ArrayList<>();
-
         if (head == null) {
-            return utilList;
+            throw new NullPointerException("Ошибка! Список истории задач пуст");
         }
         Node<Task> task = head;
         utilList.add(task.getValue());

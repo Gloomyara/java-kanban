@@ -5,6 +5,7 @@ import ru.mikhailantonov.taskmanager.util.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -17,11 +18,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private final File autoSave;
     //считываем таски
     public FileBackedTasksManager(File file) {
+        super();
         this.autoSave = file;
     }
 
     //чтение файла задач и истории
-    public static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file){
         List<String> list = new ArrayList<>();
         FileBackedTasksManager ftm = new FileBackedTasksManager(file);
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -49,15 +51,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
     //Сохранить задачи и историю просмотров в файл
     private void save() {
-        var tasks = getAllTypesTasks();
-        TaskIdComparator taskIdComparator = new TaskIdComparator();
-        tasks.sort(taskIdComparator);
+
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(autoSave, StandardCharsets.UTF_8))) {
 
-            bufferedWriter.write("id,type,name,status,description,epicId");
+            bufferedWriter.write("startTime,id,type,name,status,description,duration,epicId");
             bufferedWriter.newLine();
 
-            for (Task task : tasks) {
+            for (Task task : allTasksPrioritizedSet) {
                 bufferedWriter.write(task.toString());
                 bufferedWriter.newLine();
             }
@@ -71,24 +71,36 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     //создание задачи по данным из строки
-    public Task taskFromString(String value) throws NumberFormatException {
+    public Task taskFromString(String value) throws IllegalArgumentException {
         String[] line = value.split(",");
-        //id,type,name,status,description,epic
-        switch (TaskType.valueOf(line[1])) {
+        LocalDateTime startTime;
+        if (line[0].equals("null")) {
+            startTime = null;
+        } else {
+            startTime = LocalDateTime.parse(line[0], FileManager.DATE_TIME_FORMATTER);
+        }
+        switch (TaskType.valueOf(line[2])) { //startTime,id,type,name,status,description,duration,epicId
             case TASK: {
-                Task task = new Task(line[2], StatusType.fromString(line[3]), line[4]);
-                task.setTaskId(Integer.parseInt(line[0]));
+                Task task = new Task(startTime, line[3], StatusType.fromString(line[4]),
+                        line[5], Integer.parseInt(line[6]));
+
+                task.setTaskId(Integer.parseInt(line[1]));
+                if (id <= task.getTaskId()) id = task.getTaskId() + 1;
                 return task;
             }
             case EPIC: {
-                Task task = new EpicTask(line[2], line[4]);
-                task.setTaskId(Integer.parseInt(line[0]));
-                task.setTaskStatus(StatusType.fromString(line[3]));
+                Task task = new EpicTask(line[3], line[5]);
+                task.setTaskId(Integer.parseInt(line[1]));
+                if (id <= task.getTaskId()) id = task.getTaskId() + 1;
+                task.setTaskStatus(StatusType.fromString(line[4]));
                 return task;
             }
             case SUBTASK: {
-                Task task = new SubTask(line[2], StatusType.fromString(line[3]), line[4], Integer.parseInt(line[5]));
-                task.setTaskId(Integer.parseInt(line[0]));
+                Task task = new SubTask(startTime, line[3], StatusType.fromString(line[4]),
+                        line[5], Integer.parseInt(line[6]), Integer.parseInt(line[7]));
+
+                task.setTaskId(Integer.parseInt(line[1]));
+                if (id <= task.getTaskId()) id = task.getTaskId() + 1;
                 return task;
             }
             default:
@@ -117,21 +129,21 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     @Override
-    public Task getTaskObjectById(int taskId) {
+    public Task getTaskObjectById(Integer taskId) {
         Task task = super.getTaskObjectById(taskId);
         save();
         return task;
     }
 
     @Override
-    public void manageTaskObject(Task object) {
+    public void manageTaskObject(Task object) throws IllegalArgumentException {
         super.manageTaskObject(object);
         save();
     }
 
     @Override
-    public boolean deleteTaskById(int taskId) {
-        boolean b = super.deleteTaskById(taskId);
+    public boolean deleteTaskObjectById(Integer taskId) {
+        boolean b = super.deleteTaskObjectById(taskId);
         save();
         return b;
     }

@@ -3,15 +3,19 @@ package ru.mikhailantonov.taskmanager.util;
 import ru.mikhailantonov.taskmanager.manager.*;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Утилитарный класс для создания менеджеров
- * когда-нибудь он сможет создавать больше 1 типа менеджера
+ * уже 3
  */
 
 public class Managers {
     private static TaskManager t;
     private static HistoryManager h;
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
+
 
     public static TaskManager getDefault() {
         if (t == null) {
