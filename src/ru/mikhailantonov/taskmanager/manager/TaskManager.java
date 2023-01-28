@@ -1,10 +1,10 @@
 package ru.mikhailantonov.taskmanager.manager;
 
 import ru.mikhailantonov.taskmanager.task.*;
-import ru.mikhailantonov.taskmanager.util.TimeStampsCrossingException;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 /**
@@ -61,4 +61,5 @@ public interface TaskManager {
 
     boolean deleteAllSubTasks();
 
+    HashMap<LocalDateTime, Boolean> getTimeMap();
 }

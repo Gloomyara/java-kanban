@@ -4,6 +4,7 @@ import ru.mikhailantonov.taskmanager.util.FileManager;
 import ru.mikhailantonov.taskmanager.util.StatusType;
 import ru.mikhailantonov.taskmanager.util.TaskType;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,23 +14,25 @@ import java.util.Objects;
 
 public class SubTask extends Task {
     private Integer epicTaskId;
-    private final TaskType taskType = TaskType.SUBTASK;
 
     public SubTask(String taskName, StatusType taskStatus, String taskDescription, Integer epicTaskId) {
         super(taskName, taskStatus, taskDescription);
         this.epicTaskId = epicTaskId;
+        this.taskType = TaskType.SUBTASK;
     }
 
     public SubTask(String taskName, StatusType taskStatus,
                    String taskDescription, Integer durationInMinutes, Integer epicTaskId) {
         super(taskName, taskStatus, taskDescription, durationInMinutes);
         this.epicTaskId = epicTaskId;
+        this.taskType = TaskType.SUBTASK;
     }
 
     public SubTask(LocalDateTime startTime, String taskName, StatusType taskStatus,
                    String taskDescription, Integer durationInMinutes, Integer epicTaskId) {
         super(startTime, taskName, taskStatus, taskDescription, durationInMinutes);
         this.epicTaskId = epicTaskId;
+        this.taskType = TaskType.SUBTASK;
     }
 
     public Integer getEpicTaskId() {
@@ -39,7 +42,14 @@ public class SubTask extends Task {
     public void setEpicTaskId(Integer epicTaskId) {
         this.epicTaskId = epicTaskId;
     }
-
+    @Override
+    public TaskType getTaskType() {
+        return taskType;
+    }
+    @Override
+    public Duration getDuration(){
+        return duration;
+    }
     @Override
     public int hashCode() {
         int hash = 17;

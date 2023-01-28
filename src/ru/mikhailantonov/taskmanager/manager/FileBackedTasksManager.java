@@ -6,15 +6,14 @@ import ru.mikhailantonov.taskmanager.util.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Класс для обработки и хранения объектов задач в файле и/или создания задач из файла
  */
 
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+
     private final File autoSave;
 
     //считываем таски
@@ -24,7 +23,8 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     }
 
     //чтение файла задач и истории
-    public static FileBackedTasksManager loadFromFile(File file) {
+    public static FileBackedTasksManager loadFromFile(File file)
+            throws ManagerSaveException, TimeStampsCrossingException, NoSuchElementException {
         List<String> list = new ArrayList<>();
         FileBackedTasksManager ftm = new FileBackedTasksManager(file);
         try (BufferedReader fileReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
@@ -33,21 +33,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 list.add(line);
             }
             int i = 1;
+            if (i>=list.size()) {
+                throw new ManagerSaveException("Ошибка! Невозможно загрузить данные из пустого файла");
+            }
             while (!list.get(i).isBlank()) {
                 ftm.manageTaskObject(ftm.taskFromString(list.get(i)));
                 i++;
             }
             i++;
-            for (int taskId : historyFromString(list.get(i))) {
-                ftm.getTaskObjectById(taskId);
+            if (i < list.size()) {
+                for (int taskId : historyFromString(list.get(i))) {
+                    ftm.getTaskObjectById(taskId);
+                }
+            } else {
+                throw new ManagerSaveException("Не удалось загрузить список истории");
             }
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
             System.out.println("Произошла ошибка во время чтения файла.");
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        } catch (TimeStampsCrossingException e) {
-            System.out.println(e.getMessage());
         }
         return ftm;
     }
@@ -56,11 +59,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     private void save() {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(autoSave, StandardCharsets.UTF_8))) {
-
+            var tasks = getAllTypesTasks();
+            Comparator<Task> taskIdComparator = Comparator.comparingInt(Task::getTaskId);
+            tasks.sort(taskIdComparator);
             bufferedWriter.write("startTime,id,type,name,status,description,duration,epicId");
             bufferedWriter.newLine();
 
-            for (Task task : allTasksPrioritizedSet) {
+            for (Task task : tasks) {
                 bufferedWriter.write(task.toString());
                 bufferedWriter.newLine();
             }
@@ -172,4 +177,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         return b;
     }
 
+    public File getAutoSave() {
+        return autoSave;
+    }
 }

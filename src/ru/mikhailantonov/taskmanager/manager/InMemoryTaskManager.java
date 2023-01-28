@@ -5,7 +5,6 @@ import ru.mikhailantonov.taskmanager.util.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 import static ru.mikhailantonov.taskmanager.util.TimeMapManager.*;
 
@@ -22,15 +21,27 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, EpicTask> epicTaskMap = new HashMap<>();
     protected final HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
     protected ArrayList<Task> tasksList;
-    protected Function<Task, Integer> statusDoneLast = t1 -> (t1.getTaskStatus() != StatusType.DONE) ? 1
-            : (t1.getTaskStatus() == StatusType.DONE) ? -1 : 0;
-    protected Comparator<Task> comparator =
-            Comparator.comparing(statusDoneLast).thenComparing(
-                    Task::getStartTime, Comparator.nullsLast(Comparator.reverseOrder()));
 
-
-
-    protected TreeSet<Task> allTasksPrioritizedSet = new TreeSet<>(comparator);
+    protected Comparator<Task> comparator1 = (t1, t2) -> {
+        if (!t1.getTaskStatus().equals(StatusType.DONE) && t2.getTaskStatus().equals(StatusType.DONE)) {
+            return -1;
+        } else if (t1.getTaskStatus().equals(StatusType.DONE) && !t2.getTaskStatus().equals(StatusType.DONE)) {
+            return 1;
+        }
+        if (t1.getStartTime() == null && t2.getStartTime() != null) {
+            return 1;
+        } else if (t1.getStartTime() != null && t2.getStartTime() == null) {
+            return -1;
+        } else if (t1.getStartTime() != null && t2.getStartTime() != null) {
+            if (t1.getStartTime().isBefore(t2.getStartTime())) {
+                return -1;
+            } else if (t1.getStartTime().equals(t2.getStartTime())) {
+                return t2.getTaskId() - t1.getTaskId();
+            }
+        }
+        return 1;
+    };
+    protected TreeSet<Task> allTasksPrioritizedSet = new TreeSet<>(comparator1);
 
     public InMemoryTaskManager() {
         timeMap = TimeMapManager.createTimeMap(LocalDateTime.of(2023, 1, 1, 0, 0)
@@ -46,41 +57,31 @@ public class InMemoryTaskManager implements TaskManager {
     //обработка входящей задачи
     @Override
     public void manageTaskObject(Task object) throws NullPointerException, IllegalArgumentException
-                 ,TimeStampsCrossingException, NoSuchElementException {
-        try {
-            if (object == null) {
-                throw new NullPointerException("Ошибка при обработке задачи! Невозможно обработать пустой объект задачи");
-            } else {
-                //присвоить id
-                if (object.getTaskId() == null) {
-                    //подкрутка id
-                    while (taskMap.containsKey(id) || epicTaskMap.containsKey(id)
-                            || epicSubTaskIdMap.containsKey(id)) {
-                        id++;
-                    }
-                    object.setTaskId(id);
-                    id = id + 1;
-                }
-                switch (object.getTaskType()) {
-                    case TASK: {
-                        manageTask(object);
-                        return;
-                    }
-                    case SUBTASK: {
-                        manageSubTask((SubTask) object);
-                        return;
-                    }
-                    case EPIC: {
-                        manageEpicTask((EpicTask) object);
-                        return;
-                    }
-                    default:
-                        throw new IllegalArgumentException("Ошибка при обработке задачи");
-                }
+            , TimeStampsCrossingException, NoSuchElementException {
+        if (object == null) {
+            throw new NullPointerException("Ошибка при обработке задачи! Невозможно обработать пустой объект задачи");
+        } else {
+            //присвоить id
+            if (object.getTaskId() == null) {
+                object.setTaskId(id);
+                id = id + 1;
             }
-        } catch (NullPointerException | IllegalArgumentException
-                 | TimeStampsCrossingException | NoSuchElementException e) {
-            System.out.println(e.getMessage());
+            switch (object.getTaskType()) {
+                case TASK: {
+                    manageTask(object);
+                    return;
+                }
+                case SUBTASK: {
+                    manageSubTask((SubTask) object);
+                    return;
+                }
+                case EPIC: {
+                    manageEpicTask((EpicTask) object);
+                    return;
+                }
+                default:
+                    throw new IllegalArgumentException("Ошибка при обработке задачи");
+            }
         }
     }
 
@@ -88,33 +89,23 @@ public class InMemoryTaskManager implements TaskManager {
     public void manageEpicTask(EpicTask epicObject)
             throws NoSuchElementException, NullPointerException, TimeStampsCrossingException {
         if (epicObject == null) {
-            throw new NullPointerException("Ошибка при обработке задачи! Невозможно обработать пустой объект задачи");
+            throw new NullPointerException("Ошибка при обработке эпика! Невозможно обработать пустой объект задачи");
         }
         Integer taskId = epicObject.getTaskId();
-
+        if (taskId == null) {
+            throw new NullPointerException("Ошибка! taskId = null");
+        }
         if (!epicTaskMap.containsKey(taskId)) {
 
             epicObject.setTaskStatus(epicObject.epicStatusType());
             epicTaskMap.put(taskId, epicObject);
-            allTasksPrioritizedSet.add(epicObject);
         } else {
 
             EpicTask epicTask = epicTaskMap.get(taskId);
-            if (!epicTask.equals(epicObject)) {
-                /*
-                if (!epicTask.getSubTaskMap().equals(epicObject.getSubTaskMap())) {
-                    deleteOneEpicSubTasks(taskId);
-                    if (!epicObject.getSubTaskMap().isEmpty()) {
-                        for (SubTask subTask : epicObject.getSubTaskMap().values()) {
-                            manageSubTask(subTask);
-                        }
-                    }
-                }*/
-                epicTask.setTaskName(epicObject.getTaskName());
-                epicTask.setTaskDescription(epicObject.getTaskDescription());
-            }
+            allTasksPrioritizedSet.remove(epicTask);
+            epicTask.setTaskName(epicObject.getTaskName());
+            epicTask.setTaskDescription(epicObject.getTaskDescription());
             epicTask.setTaskStatus(epicTask.epicStatusType());
-            epicTask.setUpdateTime(LocalDateTime.now());
         }
     }
 
@@ -126,14 +117,17 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NullPointerException("Ошибка при обработке задачи! Невозможно обработать пустой объект задачи");
         }
         if (subObject.getEpicTaskId() == null) {
-            throw new NullPointerException("Ошибка при обработке Подзадачи! EpicTaskId = null");
+            throw new NullPointerException("Ошибка при обработке подзадачи! EpicTaskId = null");
         }
         if (subObject.getTaskStatus() == null) {
             subObject.setTaskStatus(StatusType.NEW);
         }
         Integer taskId = subObject.getTaskId();
+        if (taskId == null) {
+            throw new NullPointerException("Ошибка! taskId = null");
+        }
         Integer epicTaskId = subObject.getEpicTaskId();
-        if (epicTaskId == null || !epicTaskMap.containsKey(epicTaskId)) {
+        if (!epicTaskMap.containsKey(epicTaskId)) {
             throw new NoSuchElementException("Ошибка! эпик задачи с таким ID нет.");
         } else {
             EpicTask epicTask = epicTaskMap.get(epicTaskId);
@@ -142,6 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (!subTask.equals(subObject)) {
                     //проверка/обновление временных меток
                     if (!manageTimeStampsMap(timeMap, subObject, subTask)) return;
+                    allTasksPrioritizedSet.remove(subTask);
                     //обновление старой задачи
                     if (subObject.getStartTime() == null) {
                         subTask.setStartTime(null);
@@ -152,22 +147,23 @@ public class InMemoryTaskManager implements TaskManager {
                     subTask.setTaskName(subObject.getTaskName());
                     subTask.setTaskDescription(subObject.getTaskDescription());
                     subTask.setTaskStatus(subObject.getTaskStatus());
+                    subTask.setDuration(subObject.getDuration());
                 }
-                subTask.setUpdateTime(LocalDateTime.now());
+                allTasksPrioritizedSet.add(subTask);
                 //добавление нового объекта
             } else {
-                if (!startTimeAndDurationMatters.test(subObject)) {
+                if (startTimeAndDurationMatters.test(subObject)) {
                     //добавление меток или исключение при пересечении
                     timeMap.putAll(timeMapAddTimeStamps(timeMap, subObject));
                 }
-                if (subObject.getStartTime() != null) epicTask.setEpicStartTime();
-                epicTask.getSubTaskMap().put(taskId, subObject);
-                allTasksPrioritizedSet.add(subObject);
                 epicSubTaskIdMap.put(taskId, epicTaskId);
+                epicTask.getSubTaskMap().put(taskId, subObject);
+                if (subObject.getStartTime() != null) epicTask.setEpicStartTime();
+                allTasksPrioritizedSet.add(subObject);
             }
+
             epicTask.setEpicDuration();
             epicTask.setTaskStatus(epicTask.epicStatusType());
-            epicTask.setUpdateTime(LocalDateTime.now());
         }
     }
 
@@ -182,6 +178,9 @@ public class InMemoryTaskManager implements TaskManager {
             taskObject.setTaskStatus(StatusType.NEW);
         }
         Integer taskId = taskObject.getTaskId();
+        if (taskId == null) {
+            throw new NullPointerException("Ошибка! taskId = null");
+        }
         //обновление
         if (taskMap.containsKey(taskId)) {
 
@@ -189,6 +188,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (!task.equals(taskObject)) {
                 //проверка/обновление временных меток
                 if (!manageTimeStampsMap(timeMap, taskObject, task)) return;
+                allTasksPrioritizedSet.remove(task);
                 //обновление старой задачи
                 if (taskObject.getStartTime() == null) {
                     task.setStartTime(null);
@@ -199,12 +199,12 @@ public class InMemoryTaskManager implements TaskManager {
                 task.setTaskName(taskObject.getTaskName());
                 task.setTaskDescription(taskObject.getTaskDescription());
                 task.setTaskStatus(taskObject.getTaskStatus());
+                allTasksPrioritizedSet.add(task);
             }
-            task.setUpdateTime(LocalDateTime.now());
             //добавление нового объекта
         } else {
             //если есть startTime и duration не равно 0;
-            if (!startTimeAndDurationMatters.test(taskObject)) {
+            if (startTimeAndDurationMatters.test(taskObject)) {
                 //добавление меток или исключение при пересечении
                 timeMap.putAll(timeMapAddTimeStamps(timeMap, taskObject));
             }
@@ -219,7 +219,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskObjectById(Integer taskId) throws NoSuchElementException, NullPointerException {
 
         if (taskId == null) {
-            throw new NullPointerException("Ошибка при обработке taskId! taskId = null");
+            throw new NullPointerException("Ошибка! taskId = null");
         }
         if (taskMap.containsKey(taskId)) {
             return getTask(taskId);
@@ -240,7 +240,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Ошибка! Задача с ID:" + taskId + " не найдена");
         }
         Task task = taskMap.get(taskId);
-        task.setUpdateTime(LocalDateTime.now());
         historyManager.add(task);
         return task;
     }
@@ -254,7 +253,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Ошибка! Эпик с ID: " + taskId + " не найден");
         }
         Task task = epicTaskMap.get(taskId);
-        task.setUpdateTime(LocalDateTime.now());
         historyManager.add(task);
         return task;
     }
@@ -273,8 +271,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Ошибка! В эпике: " + epicTaskId + " подзадача с ID: " + taskId + " не найдена");
         }
         Task task = epicObject.getSubTaskMap().get(taskId);
-        task.setUpdateTime(LocalDateTime.now());
-        epicObject.setUpdateTime(LocalDateTime.now());
         historyManager.add(task);
         return task;
     }
@@ -334,7 +330,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epicTaskMap.containsKey(epicTaskId)) {
             EpicTask epicObject = epicTaskMap.get(epicTaskId);
             historyManager.add(epicObject);
-            if (epicObject.getSubTaskMap().isEmpty()){
+            if (epicObject.getSubTaskMap().isEmpty()) {
                 return tasksList;
             }
             tasksList.addAll(epicObject.getSubTaskMap().values());
@@ -462,6 +458,7 @@ public class InMemoryTaskManager implements TaskManager {
             allTasksPrioritizedSet.remove(subTask);
             timeMap.putAll(timeMapRemoveTimeStamps(subTask));
         }
+        epicObject.getSubTaskMap().clear();
         System.out.println("В эпике с ID: " + epicTaskId + " все подзадачи удалены.");
         return true;
     }
@@ -538,5 +535,10 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println("Нечего удалять");
             return false;
         }
+    }
+
+    @Override
+    public HashMap<LocalDateTime, Boolean> getTimeMap() {
+        return timeMap;
     }
 }

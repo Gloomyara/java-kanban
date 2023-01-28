@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="\TestResources\testautosave.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\resources\autosave.csv">
           <value>
             <Attribute>
@@ -10,6 +17,7 @@
             </Attribute>
           </value>
         </entry>
+        <entry />
       </map>
     </option>
   </component>

@@ -17,11 +17,9 @@ public class EpicTask extends Task {
 
     private final HashMap<Integer, SubTask> subTaskMap = new HashMap<>();
 
-    private final TaskType taskType = TaskType.EPIC;
-    private Duration duration;
-
     public EpicTask(String taskName, String taskDescription) {
         super(taskName, taskDescription);
+        this.taskType = TaskType.EPIC;
     }
 
     public StatusType epicStatusType() {
@@ -53,12 +51,14 @@ public class EpicTask extends Task {
     }
 
     public void setEpicDuration() {
+        this.duration = Duration.ofMinutes(0);
         if (subTaskMap.isEmpty()) {
-            duration = Duration.ofMinutes(0);
+            this.duration = Duration.ofMinutes(0);
         } else {
-            for (int i : subTaskMap.keySet()) {
-                SubTask object = subTaskMap.get(i);
-                duration = duration.plus(object.getDuration());
+            for (SubTask object : subTaskMap.values()) {
+                if (object.getDuration() != null) {
+                    this.duration = duration.plus(object.getDuration());
+                }
             }
         }
     }
@@ -67,9 +67,8 @@ public class EpicTask extends Task {
         if (subTaskMap.isEmpty()) {
             startTime = null;
         } else {
-            for (int i : subTaskMap.keySet()) {
-                SubTask object = subTaskMap.get(i);
-                if (startTime.isAfter(object.getStartTime()) || startTime == null) {
+            for (SubTask object : subTaskMap.values()) {
+                if (startTime == null || startTime.isAfter(object.getStartTime())) {
                     startTime = object.startTime;
                 }
             }
@@ -78,6 +77,11 @@ public class EpicTask extends Task {
 
     public HashMap<Integer, SubTask> getSubTaskMap() {
         return subTaskMap;
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return taskType;
     }
 
     @Override
@@ -107,9 +111,7 @@ public class EpicTask extends Task {
             hash = hash + taskStatus.hashCode();
         }
         hash = hash * 31;
-        if (!subTaskMap.isEmpty()) {
-            hash = hash + subTaskMap.hashCode();
-        }
+        hash = hash + subTaskMap.hashCode();
         hash = hash * 31;
         return hash;
     }
@@ -127,7 +129,7 @@ public class EpicTask extends Task {
                 Objects.equals(taskDescription, otherTask.taskDescription) &&
                 Objects.equals(duration, otherTask.duration) &&
                 Objects.equals(startTime, otherTask.startTime) &&
-                Objects.equals(taskStatus, otherTask.taskStatus)&&
+                Objects.equals(taskStatus, otherTask.taskStatus) &&
                 Objects.equals(subTaskMap, otherTask.subTaskMap);
     }
 
@@ -139,7 +141,7 @@ public class EpicTask extends Task {
         } else {
             result = startTime.format(FileManager.DATE_TIME_FORMATTER);
         }
-        return result + "," + taskId + "," + taskType.getTaskTypeName() + "," + taskName
-                + "," + taskStatus.getStatusName() + "," + taskDescription;
+        return result + "," + taskId + "," + taskType.getTaskTypeName() + "," + taskName + ","
+                + taskStatus.getStatusName() + "," + taskDescription+ "," + duration.toMinutes();
     }
 }

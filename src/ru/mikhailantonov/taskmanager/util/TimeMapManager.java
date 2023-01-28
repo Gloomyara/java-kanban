@@ -23,8 +23,8 @@ public class TimeMapManager {
      * Возвращает true, если есть смысловая нагрузка на таблицу с метками
      */
     public static Predicate<Task> startTimeAndDurationMatters
-            = t1 -> t1.getStartTime() == null || getDuration.apply(t1) == 0
-            || !t1.getTaskStatus().equals(StatusType.DONE);
+            = t1 -> t1.getStartTime() != null && getDuration.apply(t1) != 0
+            && !t1.getTaskStatus().equals(StatusType.DONE);
     /**
      * Возвращает LocalDateTime, округленное в меньшую сторону по MINUTES_CONSTANT
      */
@@ -33,6 +33,8 @@ public class TimeMapManager {
      * Возвращает LocalDateTime, округленное в большую сторону по MINUTES_CONSTANT
      */
     public static Function<Task, LocalDateTime> getRoundedEndTime = t1 -> taskTimeRoundUp(t1.getEndTime());
+    final static int index = 60 / MINUTES_CONSTANT + 1;
+    final static int[] utilInstancesArray = new int[index];
 
     /**
      * Метод для создания временной сетки HashMap<LocalDateTime, Boolean> timeMap
@@ -44,6 +46,9 @@ public class TimeMapManager {
         for (LocalDateTime i = startValue; i.isBefore(endValue); i = i.plusMinutes(MINUTES_CONSTANT)) {
             timeMap.put(i, false);
         }
+        for (int i = 0; i < utilInstancesArray.length; i++) {
+            utilInstancesArray[i] = MINUTES_CONSTANT * (i);
+        }
         return timeMap;
     }
 
@@ -53,11 +58,7 @@ public class TimeMapManager {
      * с шагом int MINUTES_CONSTANT
      */
     public static LocalDateTime taskTimeRoundUp(LocalDateTime localDateTime) {
-        int index = 60 / MINUTES_CONSTANT + 1;
-        final int[] utilInstancesArray = new int[index];
-        for (int i = 0; i < utilInstancesArray.length; i++) {
-            utilInstancesArray[i] = MINUTES_CONSTANT * (i);
-        }
+
         LocalDate localDate = localDateTime.toLocalDate();
         LocalTime localTime = localDateTime.toLocalTime();
         LocalTime roundTime = LocalTime.of(localTime.getHour(), 0);
@@ -80,11 +81,7 @@ public class TimeMapManager {
      * с шагом int MINUTES_CONSTANT
      */
     public static LocalDateTime taskTimeRoundDown(LocalDateTime localDateTime) {
-        int index = 60 / MINUTES_CONSTANT + 1;
-        final int[] utilInstancesArray = new int[index];
-        for (int i = 0; i < utilInstancesArray.length; i++) {
-            utilInstancesArray[i] = MINUTES_CONSTANT * (i);
-        }
+
         LocalDate localDate = localDateTime.toLocalDate();
         LocalTime localTime = localDateTime.toLocalTime();
         LocalTime roundTime = LocalTime.of(localTime.getHour(), 0);
@@ -183,10 +180,12 @@ public class TimeMapManager {
      */
     public static HashMap<LocalDateTime, Boolean> timeMapRemoveTimeStamps(Task task) {
         HashMap<LocalDateTime, Boolean> tempTimeMap = new HashMap<>();
-        LocalDateTime start = getRoundedStartTime.apply(task);
-        LocalDateTime end = getRoundedEndTime.apply(task);
-        for (LocalDateTime i = start; i.isBefore(end); i = i.plusMinutes(MINUTES_CONSTANT)) {
-            tempTimeMap.put(i, false);
+        if (startTimeAndDurationMatters.test(task)) {
+            LocalDateTime start = getRoundedStartTime.apply(task);
+            LocalDateTime end = getRoundedEndTime.apply(task);
+            for (LocalDateTime i = start; i.isBefore(end); i = i.plusMinutes(MINUTES_CONSTANT)) {
+                tempTimeMap.put(i, false);
+            }
         }
         return tempTimeMap;
     }
@@ -200,12 +199,12 @@ public class TimeMapManager {
             throws TimeStampsCrossingException {
         //если в новой есть startTime, duration не равно 0 и задача не завершена,
         //а в старой нет startTime или duration равно 0 или задача завершена
-        if (!startTimeAndDurationMatters.test(taskNew) && startTimeAndDurationMatters.test(taskOld)) {
+        if (startTimeAndDurationMatters.test(taskNew) && !startTimeAndDurationMatters.test(taskOld)) {
             //добавление меток или исключение при пересечении
             timeMap.putAll(timeMapAddTimeStamps(timeMap, taskNew));
             //если в старой есть startTime, duration не равно 0 и задача не завершена,
             //а в новой нет startTime или duration равно 0 или задача завершена
-        } else if (startTimeAndDurationMatters.test(taskNew) && !startTimeAndDurationMatters.test(taskOld)) {
+        } else if (!startTimeAndDurationMatters.test(taskNew) && startTimeAndDurationMatters.test(taskOld)) {
             //удаление старых меток
             timeMap.putAll(timeMapRemoveTimeStamps(taskOld));
             //если значения startTime не равны или значения endTime(duration) не равны
@@ -220,7 +219,8 @@ public class TimeMapManager {
                 //возврат старых меток
                 timeMap.putAll(timeMapAddTimeStamps(timeMap, taskOld));
                 System.out.println(e.getMessage());
-                throw new TimeStampsCrossingException(e.getMessage());
+                throw new TimeStampsCrossingException("Не удалось обновить " + taskOld.getTaskType()
+                        + " Id: " + taskOld.getTaskId() + "; " + e.getMessage());
             }
         }
         return true;

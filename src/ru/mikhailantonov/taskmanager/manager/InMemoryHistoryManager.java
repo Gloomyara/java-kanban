@@ -40,8 +40,10 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int taskId) {
-        removeNode(utilMap.get(taskId));
-        utilMap.remove(taskId);
+        if (utilMap.containsKey(taskId)) {
+            removeNode(utilMap.get(taskId));
+            utilMap.remove(taskId);
+        }
     }
 
     @Override
@@ -83,10 +85,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         size--;
     }
 
-    private ArrayList<Task> getTasks() throws NullPointerException {
+    private ArrayList<Task> getTasks() {
         ArrayList<Task> utilList = new ArrayList<>();
         if (head == null) {
-            throw new NullPointerException("Ошибка! Список истории задач пуст");
+            return utilList;
         }
         Node<Task> task = head;
         utilList.add(task.getValue());

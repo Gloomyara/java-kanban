@@ -6,7 +6,6 @@ import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 
@@ -21,16 +20,15 @@ public class Task {
     protected String taskDescription;
     protected LocalDateTime startTime = null;
 
-    protected LocalDateTime updateTime = null;
     protected Duration duration = Duration.ofMinutes(0);
     protected LocalDateTime endTime = null;
-    private final TaskType taskType = TaskType.TASK;
+    protected TaskType taskType;
 
     public Task(String taskName, String taskDescription) {
 
         this.taskName = taskName;
         this.taskDescription = taskDescription;
-
+        taskType = TaskType.TASK;
     }
 
     public Task(String taskName, StatusType taskStatus, String taskDescription) {
@@ -38,7 +36,7 @@ public class Task {
         this.taskName = taskName;
         this.taskStatus = taskStatus;
         this.taskDescription = taskDescription;
-
+        taskType = TaskType.TASK;
     }
 
     public Task(String taskName, StatusType taskStatus, String taskDescription, Integer durationInMinutes) {
@@ -46,7 +44,17 @@ public class Task {
         this.taskName = taskName;
         this.taskStatus = taskStatus;
         this.taskDescription = taskDescription;
-        this.duration = Duration.ofMinutes(durationInMinutes);
+        this.duration = duration.plusMinutes(durationInMinutes);
+        taskType = TaskType.TASK;
+    }
+
+    public Task(LocalDateTime startTime, String taskName, StatusType taskStatus,
+                String taskDescription) {
+        this.startTime = startTime;
+        this.taskName = taskName;
+        this.taskStatus = taskStatus;
+        this.taskDescription = taskDescription;
+        taskType = TaskType.TASK;
     }
 
     public Task(LocalDateTime startTime, String taskName, StatusType taskStatus,
@@ -55,7 +63,8 @@ public class Task {
         this.taskName = taskName;
         this.taskStatus = taskStatus;
         this.taskDescription = taskDescription;
-        this.duration = Duration.ofMinutes(durationInMinutes);
+        this.duration = duration.plusMinutes(durationInMinutes);
+        taskType = TaskType.TASK;
     }
     public TaskType getTaskType() {
         return taskType;
@@ -81,20 +90,8 @@ public class Task {
         return startTime;
     }
 
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
-
     public Duration getDuration() {
         return duration;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
     }
 
     public void setTaskId(Integer taskId) {
@@ -171,7 +168,6 @@ public class Task {
                 Objects.equals(taskStatus, otherTask.taskStatus);
     }
 
-    //id,type,name,status,description,epic
     @Override
     public String toString() {
         String result;

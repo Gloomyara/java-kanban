@@ -31,8 +31,8 @@ class HistoryManagerTest {
     void addCheck() {
         historyManager.add(task1);
         final List<Task> history = historyManager.getHistory();
-        assertNotNull(history, "История не пустая.");
-        assertEquals(1, history.size(), "История не пустая.");
+        assertNotNull(history, "История пустая.");
+        assertEquals(1, history.size(), "История пустая.");
     }
 
     //удаление последнего элемента
@@ -45,7 +45,7 @@ class HistoryManagerTest {
 
         historyManager.remove(3);
         final List<Task> history = historyManager.getHistory();
-        assertNotNull(history, "История не пустая.");
+        assertNotNull(history, "История пустая.");
         assertEquals(task2, history.get(history.size() - 1));
     }
 
@@ -96,11 +96,7 @@ class HistoryManagerTest {
 
     //пустая история задач
     @Test
-    void shouldThrowExceptionWhenHistoryIsEmpty() {
-        NullPointerException ex = Assertions.assertThrows(
-                NullPointerException.class,
-                () -> historyManager.getHistory()
-        );
-        Assertions.assertEquals("Ошибка! Список истории задач пуст", ex.getMessage());
+    void shouldReturnEmptyListWhenHistoryIsEmpty() {
+        Assertions.assertTrue(historyManager.getHistory().isEmpty(), "Список истории не пуст");
     }
 }

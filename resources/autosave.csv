@@ -1,6 +1,6 @@
-id,type,name,status,description,epicId
-2,TASK,Задача2,DONE,fdsa
-6,EPIC,ЭпикЗадача2,DONE,fsgnbdfg
-7,SUBTASK,Э2 ПодЗадача1,DONE,asdfsa,6
+startTime,id,type,name,status,description,duration,epicId
+null,2,TASK,Задача2,DONE,fdsa,0
+null,6,EPIC,ЭпикЗадача2,DONE,fsgnbdfg,0
+null,7,SUBTASK,Э2 ПодЗадача1,DONE,asdfsa,0,6
 
 2,7,6
