@@ -5,6 +5,7 @@ import ru.mikhailantonov.taskmanager.util.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 
 import static ru.mikhailantonov.taskmanager.util.TimeMapManager.*;
 
@@ -22,25 +23,18 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Integer, Integer> epicSubTaskIdMap = new HashMap<>();
     protected ArrayList<Task> tasksList;
 
-    protected Comparator<Task> comparator1 = (t1, t2) -> {
-        if (!t1.getTaskStatus().equals(StatusType.DONE) && t2.getTaskStatus().equals(StatusType.DONE)) {
-            return -1;
-        } else if (t1.getTaskStatus().equals(StatusType.DONE) && !t2.getTaskStatus().equals(StatusType.DONE)) {
-            return 1;
-        }
-        if (t1.getStartTime() == null && t2.getStartTime() != null) {
-            return 1;
-        } else if (t1.getStartTime() != null && t2.getStartTime() == null) {
-            return -1;
-        } else if (t1.getStartTime() != null && t2.getStartTime() != null) {
-            if (t1.getStartTime().isBefore(t2.getStartTime())) {
-                return -1;
-            } else if (t1.getStartTime().equals(t2.getStartTime())) {
-                return t2.getTaskId() - t1.getTaskId();
-            }
-        }
-        return 1;
-    };
+    Function<Task, Integer> doneLast = (t1) -> t1.getTaskStatus().equals(StatusType.DONE) ? 1
+            : !t1.getTaskStatus().equals(StatusType.DONE) ? -1 : 0;
+    Function<Task, Integer> epicFirst = (t1) -> !t1.getTaskType().equals(TaskType.EPIC) ? 1
+            : t1.getTaskType().equals(TaskType.EPIC) ? -1 : 0;
+    protected Comparator<Task> comparator = Comparator.comparing(doneLast)
+            .thenComparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(epicFirst).thenComparing(Task::getTaskId);
+
+    protected Comparator<Task> comparator1 = Comparator.comparing(doneLast)
+            .thenComparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(Task::getTaskId);
+
     protected TreeSet<Task> allTasksPrioritizedSet = new TreeSet<>(comparator1);
 
     public InMemoryTaskManager() {
@@ -282,11 +276,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (!getAllTasks().isEmpty()) {
             allTasksList.addAll(getAllTasks());
         }
-        if (!getAllEpicTasks().isEmpty()) {
-            allTasksList.addAll(getAllEpicTasks());
-        }
         if (!getAllSubTasks().isEmpty()) {
             allTasksList.addAll(getAllSubTasks());
+        }
+        if (!getAllEpicTasks().isEmpty()) {
+            allTasksList.addAll(getAllEpicTasks());
         }
         return allTasksList;
     }
@@ -294,6 +288,11 @@ public class InMemoryTaskManager implements TaskManager {
     //получить отсортированный список задач
     @Override
     public TreeSet<Task> getPrioritizedTasks() {
+        /*
+        TreeSet<Task> someSet = new TreeSet<>(comparator);
+        someSet.addAll(getAllTypesTasks());
+        return someSet;
+        */
         return allTasksPrioritizedSet;
     }
 

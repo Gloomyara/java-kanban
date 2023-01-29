@@ -1,0 +1,15 @@
+startTime,id,type,name,status,description,duration,epicId
+null,1,TASK,Test NewTask1,DONE,Test NewTask1 description,0
+00:00 01.01.23,2,EPIC,Test NewEpicTask1,NEW,Test NewEpicTask1 description,30
+00:00 01.01.23,3,SUBTASK,Test NewSubTask11,NEW,Test NewSubTask11 description,30,2
+null,4,TASK,Test NewTask2,NEW,Test NewTask2 description,0
+null,5,TASK,Test NewTask3,NEW,Test NewTask3 description,0
+00:30 01.01.23,6,EPIC,Test NewEpicTask2,DONE,Test NewEpicTask2 description,60
+00:30 01.01.23,7,SUBTASK,Test NewSubTask21,DONE,Test NewSubTask21 description,30,6
+01:00 01.01.23,8,SUBTASK,Test NewSubTask22,DONE,Test NewSubTask22 description,30,6
+01:30 01.01.23,9,EPIC,Test NewEpicTask3,NEW,Test NewEpicTask3 description,90
+01:30 01.01.23,10,SUBTASK,Test NewSubTask31,NEW,Test NewSubTask31 description,30,9
+02:00 01.01.23,11,SUBTASK,Test NewSubTask32,NEW,Test NewSubTask32 description,30,9
+02:30 01.01.23,12,SUBTASK,Test NewSubTask33,NEW,Test NewSubTask3 description,30,9
+
+1,2,3,4,5,6,7,8,9,10,11,12
