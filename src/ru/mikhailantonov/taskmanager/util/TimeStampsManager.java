@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -126,7 +125,7 @@ public class TimeStampsManager {
      * с шагом int MINUTES_CONSTANT
      */
     public static boolean taskTimeValidation(HashSet<LocalDateTime> timeStampsSet,
-                                             Task task) throws NoSuchElementException {
+                                             Task task) {
         LocalDateTime roundStartTime = getRoundedStartTime.apply(task);
         LocalDateTime roundEndTime = getRoundedEndTime.apply(task);
 
