@@ -4,6 +4,7 @@ import ru.mikhailantonov.taskmanager.task.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -61,5 +62,5 @@ public interface TaskManager {
 
     boolean deleteAllSubTasks();
 
-    HashMap<LocalDateTime, Boolean> getTimeMap();
+    HashSet<LocalDateTime> getTimeStampsSet();
 }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
-import static ru.mikhailantonov.taskmanager.util.TimeMapManager.*;
+import static ru.mikhailantonov.taskmanager.util.TimeStampsManager.*;
 
 /**
  * Класс нашего самого 1ого менеджера, для обработки и хранения объектов задач
@@ -15,7 +15,7 @@ import static ru.mikhailantonov.taskmanager.util.TimeMapManager.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    protected final HashMap<LocalDateTime, Boolean> timeMap;
+    protected final HashSet<LocalDateTime> timeStampsSet;
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected int id = 1; //нужно для тестов
     protected final HashMap<Integer, Task> taskMap = new HashMap<>();
@@ -30,7 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected Comparator<Task> comparator = Comparator.comparing(doneLast)
             .thenComparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparing(epicFirst).thenComparing(Task::getTaskId);
-
+    //в настоящий момент используем этот
     protected Comparator<Task> comparator1 = Comparator.comparing(doneLast)
             .thenComparing(Task::getStartTime, Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparing(Task::getTaskId);
@@ -38,8 +38,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected TreeSet<Task> allTasksPrioritizedSet = new TreeSet<>(comparator1);
 
     public InMemoryTaskManager() {
-        timeMap = TimeMapManager.createTimeMap(LocalDateTime.of(2023, 1, 1, 0, 0)
-                , 1);
+        timeStampsSet = TimeStampsManager.createTimeStampsSet();
     }
 
     //вернуть историю просмотров
@@ -96,7 +95,6 @@ public class InMemoryTaskManager implements TaskManager {
         } else {
 
             EpicTask epicTask = epicTaskMap.get(taskId);
-            allTasksPrioritizedSet.remove(epicTask);
             epicTask.setTaskName(epicObject.getTaskName());
             epicTask.setTaskDescription(epicObject.getTaskDescription());
             epicTask.setTaskStatus(epicTask.epicStatusType());
@@ -129,7 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
                 SubTask subTask = epicTask.getSubTaskMap().get(taskId);
                 if (!subTask.equals(subObject)) {
                     //проверка/обновление временных меток
-                    if (!manageTimeStampsMap(timeMap, subObject, subTask)) return;
+                    if (!manageTimeStampsSet(timeStampsSet, subObject, subTask)) return;
                     allTasksPrioritizedSet.remove(subTask);
                     //обновление старой задачи
                     if (subObject.getStartTime() == null) {
@@ -148,7 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
             } else {
                 if (startTimeAndDurationMatters.test(subObject)) {
                     //добавление меток или исключение при пересечении
-                    timeMap.putAll(timeMapAddTimeStamps(timeMap, subObject));
+                    addTimeStamps(timeStampsSet, subObject);
                 }
                 epicSubTaskIdMap.put(taskId, epicTaskId);
                 epicTask.getSubTaskMap().put(taskId, subObject);
@@ -181,7 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
             Task task = taskMap.get(taskId);
             if (!task.equals(taskObject)) {
                 //проверка/обновление временных меток
-                if (!manageTimeStampsMap(timeMap, taskObject, task)) return;
+                if (!manageTimeStampsSet(timeStampsSet, taskObject, task)) return;
                 allTasksPrioritizedSet.remove(task);
                 //обновление старой задачи
                 if (taskObject.getStartTime() == null) {
@@ -200,7 +198,7 @@ public class InMemoryTaskManager implements TaskManager {
             //если есть startTime и duration не равно 0;
             if (startTimeAndDurationMatters.test(taskObject)) {
                 //добавление меток или исключение при пересечении
-                timeMap.putAll(timeMapAddTimeStamps(timeMap, taskObject));
+                addTimeStamps(timeStampsSet, taskObject);
             }
             taskMap.put(taskId, taskObject);
             allTasksPrioritizedSet.add(taskObject);
@@ -384,7 +382,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         Task task = taskMap.get(taskId);
         allTasksPrioritizedSet.remove(task);
-        timeMap.putAll(timeMapRemoveTimeStamps(task));
+        removeTimeStamps(timeStampsSet, task);
         taskMap.remove(taskId);
         historyManager.remove(taskId);
         System.out.println("Задача под номером: " + taskId + " удалена.");
@@ -404,7 +402,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(subTask.getTaskId());
             epicSubTaskIdMap.remove(subTask.getTaskId());
             allTasksPrioritizedSet.remove(subTask);
-            timeMap.putAll(timeMapRemoveTimeStamps(subTask));
+            removeTimeStamps(timeStampsSet, subTask);
         }
         allTasksPrioritizedSet.remove(epicObject);
         historyManager.remove(taskId);
@@ -427,7 +425,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Ошибка! В эпике: " + epicTaskId + " подзадача с ID: " + taskId + " не найдена");
         }
         Task subTask = epicObject.getSubTaskMap().get(taskId);
-        timeMap.putAll(timeMapRemoveTimeStamps(subTask));
+        removeTimeStamps(timeStampsSet, subTask);
         epicObject.getSubTaskMap().remove(taskId);
         epicObject.setEpicDuration();
         epicObject.setEpicStartTime();
@@ -455,7 +453,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(subTask.getTaskId());
             epicSubTaskIdMap.remove(subTask.getTaskId());
             allTasksPrioritizedSet.remove(subTask);
-            timeMap.putAll(timeMapRemoveTimeStamps(subTask));
+            removeTimeStamps(timeStampsSet, subTask);
         }
         epicObject.getSubTaskMap().clear();
         System.out.println("В эпике с ID: " + epicTaskId + " все подзадачи удалены.");
@@ -470,7 +468,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (Task task : taskMap.values()) {
                 historyManager.remove(task.getTaskId());
                 allTasksPrioritizedSet.remove(task);
-                timeMap.putAll(timeMapRemoveTimeStamps(task));
+                removeTimeStamps(timeStampsSet, task);
             }
             taskMap.clear();
             System.out.println("все задачи удалены");
@@ -492,7 +490,7 @@ public class InMemoryTaskManager implements TaskManager {
                     if (!epicObject.getSubTaskMap().isEmpty()) {
                         historyManager.remove(subTask.getTaskId());
                         allTasksPrioritizedSet.remove(subTask);
-                        timeMap.putAll(timeMapRemoveTimeStamps(subTask));
+                        removeTimeStamps(timeStampsSet, subTask);
                     }
                 }
                 historyManager.remove(epicObject.getTaskId());
@@ -517,7 +515,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (EpicTask epicObject : epicTaskMap.values()) {
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     for (Task subTask : epicObject.getSubTaskMap().values()) {
-                        timeMap.putAll(timeMapRemoveTimeStamps(subTask));
+                        removeTimeStamps(timeStampsSet,subTask);
                         historyManager.remove(subTask.getTaskId());
                         allTasksPrioritizedSet.remove(subTask);
                     }
@@ -537,7 +535,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public HashMap<LocalDateTime, Boolean> getTimeMap() {
-        return timeMap;
+    public HashSet<LocalDateTime> getTimeStampsSet() {
+        return timeStampsSet;
     }
 }

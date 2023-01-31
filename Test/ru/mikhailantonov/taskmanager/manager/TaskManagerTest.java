@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.mikhailantonov.taskmanager.util.TimeMapManager.taskStartTimeValidation;
+import static ru.mikhailantonov.taskmanager.util.TimeStampsManager.taskTimeValidation;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 
@@ -164,7 +164,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task1, savedTask, "Задачи не совпадают.");
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные метки не сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные метки не сохранены");
         final List<Task> tasks = taskManager.getAllTasks();
 
         assertFalse(tasks.isEmpty(), "Задачи нe возвращаются.");
@@ -191,7 +191,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(task2, savedTask, "Задачи не совпадают.");
         assertEquals(savedTask.getStartTime(), task2.getStartTime());
         assertEquals(savedTask.getDuration(), task2.getDuration());
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), task2), "Временные метки не сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), task2), "Временные метки не сохранены");
         final List<Task> tasks = taskManager.getAllTasks();
 
         assertFalse(tasks.isEmpty(), "Задачи не возвращаются.");
@@ -284,7 +284,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(subTask11, savedTask, "Задачи не совпадают.");
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), subTask11), "Временные метки не сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), subTask11), "Временные метки не сохранены");
         final List<Task> tasks = taskManager.getAllSubTasks();
         final List<Task> oneEpicSubTasks = taskManager.getOneEpicSubTasks(epicTaskId);
 
@@ -313,7 +313,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(savedTask.getStartTime(), subTask21.getStartTime(), "Время старта задачи не совпадает");
         assertEquals(savedTask.getDuration(), subTask21.getDuration(), "Длительность задачи не совпадает");
         assertEquals(subTask21, savedTask, "Задачи не совпадают.");
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), subTask21), "Временные метки не сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), subTask21), "Временные метки не сохранены");
         final List<Task> tasks = taskManager.getAllSubTasks();
         final List<Task> oneEpicSubTasks = taskManager.getOneEpicSubTasks(epicTaskId);
         assertFalse(tasks.isEmpty(), "Задачи нe возвращаются.");
@@ -712,7 +712,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(1, taskManager.getAllTasks().size(), "Список задач пуст");
         assertTrue(taskManager.deleteTask(task1.getTaskId()), "задача не удалена");
         assertEquals(0, taskManager.getAllTasks().size(), "задача не удалена");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task1)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task1)
                 , "Временные метки не были удалены");
     }
 
@@ -772,7 +772,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(1, taskManager.getAllSubTasks().size(), "Список подзадач пуст");
         assertTrue(taskManager.deleteSubTask(subTask11.getTaskId()), "задача не удалена");
         assertEquals(0, taskManager.getAllSubTasks().size(), "задача не удалена");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), subTask11)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), subTask11)
                 , "Временные метки не были удалены");
     }
 
@@ -814,11 +814,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(taskManager.deleteAllTasks(), "Удаление всех задач не удалось");
         tasks = taskManager.getAllTasks();
         assertTrue(tasks.isEmpty(), "Удаление всех задач не удалось");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task1)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task1)
                 , "Временные метки не были удалены");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task2)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task2)
                 , "Временные метки не были удалены");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task3)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task3)
                 , "Временные метки не были удалены");
     }
 
@@ -866,11 +866,11 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(taskManager.deleteAllSubTasks(), "Удаление всех подзадач не удалось");
         tasks = taskManager.getAllSubTasks();
         assertTrue(tasks.isEmpty(), "Удаление всех подзадач не удалось");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), subTask11)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), subTask11)
                 , "Временные метки не были удалены");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), subTask21)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), subTask21)
                 , "Временные метки не были удалены");
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), subTask31)
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), subTask31)
                 , "Временные метки не были удалены");
     }
 
@@ -888,16 +888,16 @@ abstract class TaskManagerTest<T extends TaskManager> {
         task1.setStartTime(startTime);
         task2.setDuration(Duration.ofMinutes(30));
         taskManager.manageTaskObject(task2);
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные метки сохранены");
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные метки сохранены");
         task3.setStartTime(startTime);
         taskManager.manageTaskObject(task3);
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные метки сохранены");
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные метки сохранены");
         task3.setDuration(Duration.ofMinutes(30));
         task3.setTaskStatus(StatusType.DONE);
         taskManager.manageTaskObject(task3);
-        assertTrue(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные метки сохранены");
+        assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные метки сохранены");
         taskManager.manageTaskObject(task1);
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные не метки сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные не метки сохранены");
     }
     @Test
     void shouldThrowExceptionWhenTimeStampsIsCrossing() {
@@ -908,7 +908,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         LocalDateTime startTime2 = startTime1.plusMinutes(30);
         task2.setStartTime(startTime2);
         taskManager.manageTaskObject(task1);
-        assertFalse(taskStartTimeValidation(taskManager.getTimeMap(), task1), "Временные метки не сохранены");
+        assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные метки не сохранены");
         TimeStampsCrossingException ex = Assertions.assertThrows(
                 TimeStampsCrossingException.class,
                 () -> taskManager.manageTaskObject(task2)

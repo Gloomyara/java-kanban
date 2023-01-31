@@ -5,7 +5,7 @@ import ru.mikhailantonov.taskmanager.task.Task;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 /**
  * Utility class для работы с LocalDateTime в TaskManager преимущественно для Task и SubTask
  */
-public class TimeMapManager {
+public class TimeStampsManager {
     public static final int MINUTES_CONSTANT = 15; //шаг временной сетки в минутах
     /**
      * Возвращает duration в intMinutes
@@ -37,24 +37,20 @@ public class TimeMapManager {
     final static int[] utilInstancesArray = new int[index];
 
     /**
-     * Метод для создания временной сетки HashMap<LocalDateTime, Boolean> timeMap
+     * Метод для создания временной сетки HashSet<LocalDateTime> timeStampsSet
      * с шагом int minutes, с нижней границей startValue и верхней границей startValue.plusYears(years)
      */
-    public static HashMap<LocalDateTime, Boolean> createTimeMap(LocalDateTime startValue, int years) {
-        HashMap<LocalDateTime, Boolean> timeMap = new HashMap<>();
-        LocalDateTime endValue = startValue.plusYears(years);
-        for (LocalDateTime i = startValue; i.isBefore(endValue); i = i.plusMinutes(MINUTES_CONSTANT)) {
-            timeMap.put(i, false);
-        }
+    public static HashSet<LocalDateTime> createTimeStampsSet() {
+        HashSet<LocalDateTime> timeStampsSet = new HashSet<>();
         for (int i = 0; i < utilInstancesArray.length; i++) {
             utilInstancesArray[i] = MINUTES_CONSTANT * (i);
         }
-        return timeMap;
+        return timeStampsSet;
     }
 
     /**
      * Метод для округления в меньшую сторону, времени заданного через метод
-     * getEndTime() в Task на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
+     * getEndTime() в Task на основе временной сетки HashSet<LocalDateTime> timeStampsSet
      * с шагом int MINUTES_CONSTANT
      */
     public static LocalDateTime taskTimeRoundUp(LocalDateTime localDateTime) {
@@ -77,7 +73,7 @@ public class TimeMapManager {
 
     /**
      * Метод для округления в меньшую сторону, времени заданного как startTime в Task
-     * на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
+     * на основе временной сетки HashSet<LocalDateTime> timeStampsSet
      * с шагом int MINUTES_CONSTANT
      */
     public static LocalDateTime taskTimeRoundDown(LocalDateTime localDateTime) {
@@ -101,71 +97,59 @@ public class TimeMapManager {
 
     /**
      * Метод для коррекции пересечений заданного времени для выполнения Task
-     * на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
+     * на основе временной сетки HashSet<LocalDateTime> timeStampsSet
      * с шагом int MINUTES_CONSTANT
      */
-    public static void taskStartTimeCorrection(HashMap<LocalDateTime, Boolean> timeMap, Task task) {
+    public static void taskStartTimeCorrection(HashSet<LocalDateTime> timeStampsSet, Task task) {
         LocalDateTime roundStartTime = getRoundedStartTime.apply(task);
         LocalDateTime roundEndTime = getRoundedEndTime.apply(task);
 
-        if (!timeMap.containsKey(roundStartTime)) {
-            throw new NoSuchElementException();
-        } else {
-            boolean isFree = true;
-            while (isFree) {
-                boolean b = true;
-                for (LocalDateTime i = roundStartTime; i.isBefore(roundEndTime); i = i.plusMinutes(MINUTES_CONSTANT)) {
-                    b = timeMap.get(i);
-                    if (b) {
-                        roundStartTime = i.plusMinutes(MINUTES_CONSTANT);
-                        task.setStartTime(roundStartTime);
-                        roundEndTime = taskTimeRoundUp(task.getEndTime());
-                        break;
-                    }
+        boolean isFree = true;
+        while (isFree) {
+            boolean b = true;
+            for (LocalDateTime i = roundStartTime; i.isBefore(roundEndTime); i = i.plusMinutes(MINUTES_CONSTANT)) {
+                b = timeStampsSet.contains(i);
+                if (b) {
+                    roundStartTime = i.plusMinutes(MINUTES_CONSTANT);
+                    task.setStartTime(roundStartTime);
+                    roundEndTime = getRoundedEndTime.apply(task);
+                    break;
                 }
-                isFree = b;
             }
+            isFree = b;
         }
     }
 
     /**
      * Метод для проверки пересечений заданного времени для выполнения Task
-     * на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
+     * на основе временной сетки HashSet<LocalDateTime> timeStampsSet
      * с шагом int MINUTES_CONSTANT
      */
-    public static boolean taskStartTimeValidation(HashMap<LocalDateTime, Boolean> timeMap,
-                                                  Task task) throws NoSuchElementException {
+    public static boolean taskTimeValidation(HashSet<LocalDateTime> timeStampsSet,
+                                             Task task) throws NoSuchElementException {
         LocalDateTime roundStartTime = getRoundedStartTime.apply(task);
         LocalDateTime roundEndTime = getRoundedEndTime.apply(task);
 
-        if (!timeMap.containsKey(roundStartTime)) {
-            throw new NoSuchElementException("Ошибка! Превышена граница таблицы timeMap");
-        } else {
-            for (LocalDateTime i = roundStartTime; i.isBefore(roundEndTime); i = i.plusMinutes(MINUTES_CONSTANT)) {
-                if (timeMap.get(i)) {
-                    return false;
-                }
+        for (LocalDateTime i = roundStartTime; i.isBefore(roundEndTime); i = i.plusMinutes(MINUTES_CONSTANT)) {
+            if (timeStampsSet.contains(i)) {
+                return false;
             }
-            return true;
         }
+        return true;
     }
 
     /**
-     * Метод для добавления временных меток на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
-     * с шагом int MINUTES_CONSTANT, возвращает HashMap<LocalDateTime, Boolean> tempTimeMap с позитивными
-     * метками при отсутствии пересечений
+     * Метод для добавления временных меток с шагом int MINUTES_CONSTANT,
+     * добавляет метки в HashSet<LocalDateTime> timeStampsSet при отсутствии пересечений
      */
-    public static HashMap<LocalDateTime, Boolean> timeMapAddTimeStamps(HashMap<LocalDateTime,
-            Boolean> timeMap, Task task) throws TimeStampsCrossingException {
-        HashMap<LocalDateTime, Boolean> tempTimeMap = new HashMap<>();
+    public static void addTimeStamps(HashSet<LocalDateTime> timeStampsSet, Task task) throws TimeStampsCrossingException {
         LocalDateTime start = getRoundedStartTime.apply(task);
         LocalDateTime end = getRoundedEndTime.apply(task);
         //поиск пересечений и добавление меток, если пересечений нет
-        if (taskStartTimeValidation(timeMap, task)) {
+        if (taskTimeValidation(timeStampsSet, task)) {
             for (LocalDateTime i = start; i.isBefore(end); i = i.plusMinutes(MINUTES_CONSTANT)) {
-                tempTimeMap.put(i, true);
+                timeStampsSet.add(i);
             }
-            return tempTimeMap;
         } else {
             throw new TimeStampsCrossingException("Ошибка! На время С: "
                     + start.format(FileManager.DATE_TIME_FORMATTER)
@@ -175,49 +159,46 @@ public class TimeMapManager {
     }
 
     /**
-     * Метод для удаления временных меток на основе временной сетки HashMap<LocalDateTime, Boolean> timeMap
-     * с шагом int MINUTES_CONSTANT, возвращает HashMap<LocalDateTime, Boolean> tempTimeMap с негативными метками
+     * Метод для удаления временных меток из HashSet<LocalDateTime> timeStampsSet с шагом int MINUTES_CONSTANT
      */
-    public static HashMap<LocalDateTime, Boolean> timeMapRemoveTimeStamps(Task task) {
-        HashMap<LocalDateTime, Boolean> tempTimeMap = new HashMap<>();
+    public static void removeTimeStamps(HashSet<LocalDateTime> timeStampsSet, Task task) {
         if (startTimeAndDurationMatters.test(task)) {
             LocalDateTime start = getRoundedStartTime.apply(task);
             LocalDateTime end = getRoundedEndTime.apply(task);
             for (LocalDateTime i = start; i.isBefore(end); i = i.plusMinutes(MINUTES_CONSTANT)) {
-                tempTimeMap.put(i, false);
+                timeStampsSet.remove(i);
             }
         }
-        return tempTimeMap;
     }
 
     /**
      * Метод для добавления/проверки временных меток при обработке задачи,
      * возвращает true, если не найдено пересечений
      */
-    public static boolean manageTimeStampsMap(
-            HashMap<LocalDateTime, Boolean> timeMap, Task taskNew, Task taskOld)
+    public static boolean manageTimeStampsSet(
+            HashSet<LocalDateTime> timeStampsSet, Task taskNew, Task taskOld)
             throws TimeStampsCrossingException {
         //если в новой есть startTime, duration не равно 0 и задача не завершена,
         //а в старой нет startTime или duration равно 0 или задача завершена
         if (startTimeAndDurationMatters.test(taskNew) && !startTimeAndDurationMatters.test(taskOld)) {
             //добавление меток или исключение при пересечении
-            timeMap.putAll(timeMapAddTimeStamps(timeMap, taskNew));
+            addTimeStamps(timeStampsSet, taskNew);
             //если в старой есть startTime, duration не равно 0 и задача не завершена,
             //а в новой нет startTime или duration равно 0 или задача завершена
         } else if (!startTimeAndDurationMatters.test(taskNew) && startTimeAndDurationMatters.test(taskOld)) {
             //удаление старых меток
-            timeMap.putAll(timeMapRemoveTimeStamps(taskOld));
+            removeTimeStamps(timeStampsSet, taskOld);
             //если значения startTime не равны или значения endTime(duration) не равны
         } else if (!taskNew.getStartTime().equals(taskOld.getStartTime())
                 || !taskNew.getEndTime().equals(taskOld.getStartTime())) {
             try {
                 //удаление старых меток
-                timeMap.putAll(timeMapRemoveTimeStamps(taskOld));
+                removeTimeStamps(timeStampsSet, taskOld);
                 //добавление новых меток или исключение при пересечении
-                timeMap.putAll(timeMapAddTimeStamps(timeMap, taskNew));
+                addTimeStamps(timeStampsSet, taskNew);
             } catch (TimeStampsCrossingException e) {
                 //возврат старых меток
-                timeMap.putAll(timeMapAddTimeStamps(timeMap, taskOld));
+                addTimeStamps(timeStampsSet, taskOld);
                 System.out.println(e.getMessage());
                 throw new TimeStampsCrossingException("Не удалось обновить " + taskOld.getTaskType()
                         + " Id: " + taskOld.getTaskId() + "; " + e.getMessage());
