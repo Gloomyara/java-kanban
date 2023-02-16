@@ -39,6 +39,11 @@ public class TaskHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         try {
             String requestMethod = exchange.getRequestMethod();
+            if (exchange.getRequestURI().getPath().endsWith("/tasks/")&&requestMethod.equals("GET")){
+                String tasksJson = gson.toJson(taskManager.getPrioritizedTasks());
+                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                return;
+            }
             String endPoint = exchange.getRequestURI().getPath().split("/")[2].toLowerCase();
             Optional<Integer> optionalTaskId;
             Integer taskId = null;
@@ -124,10 +129,7 @@ public class TaskHandler implements HttpHandler {
 
         String tasksJson;
         switch (endPoint) {
-            case ("prioritized"):
-                tasksJson = gson.toJson(taskManager.getPrioritizedTasks());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
-                break;
+
             case ("task"):
                 tasksJson = gson.toJson(taskManager.getAllTasks());
                 writeResponse(exchange, SUCCESS.getCode(), tasksJson);

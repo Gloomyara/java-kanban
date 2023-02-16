@@ -1,8 +1,10 @@
 package ru.mikhailantonov.taskmanager.server;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.mikhailantonov.taskmanager.manager.tasks.InMemoryTaskManager;
 import ru.mikhailantonov.taskmanager.server.exceptions.HttpClientException;
 import ru.mikhailantonov.taskmanager.server.handlers.LocalDateTimeTypeAdapter;
@@ -13,7 +15,6 @@ import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 import ru.mikhailantonov.taskmanager.task.enums.TaskType;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -22,8 +23,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.mikhailantonov.taskmanager.server.enums.HttpCode.*;
@@ -322,8 +321,24 @@ class HttpTaskServerTest {
         taskManager.manageTaskObject(subTask31);
         taskManager.manageTaskObject(subTask32);
         taskManager.manageTaskObject(subTask33);
-
-        JsonElement jsonElementTasks = JsonParser.parseString(GET("prioritized/"));
+        URI url = URI.create(serverUrl + "/tasks/");
+        String response;
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(url)
+                .build();
+        try {
+            HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int code = resp.statusCode();
+            if (code == SUCCESS.getCode()) {
+                response =  resp.body();
+            } else {
+                throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась", e);
+        }
+        JsonElement jsonElementTasks = JsonParser.parseString(response);
         JsonArray array = jsonElementTasks.getAsJsonArray();
         List<Task> sortedTasks = new ArrayList<>();
         for (int i = 0; i < array.size(); i++) {
@@ -351,7 +366,24 @@ class HttpTaskServerTest {
 
     @Test
     void testGETPrioritizedTasksShouldReturnEmptyList() {
-        JsonElement jsonElementTasks = JsonParser.parseString(GET("prioritized/"));
+        URI url = URI.create(serverUrl + "/tasks/");
+        String response;
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(url)
+                .build();
+        try {
+            HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
+            int code = resp.statusCode();
+            if (code == SUCCESS.getCode()) {
+                response =  resp.body();
+            } else {
+                throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась", e);
+        }
+        JsonElement jsonElementTasks = JsonParser.parseString(response);
         Task[] tasksArray = gson.fromJson(jsonElementTasks.getAsJsonArray(), Task[].class);
         assertEquals(0, tasksArray.length, "Список задач не пустой");
     }
@@ -380,6 +412,7 @@ class HttpTaskServerTest {
         DELETE("subtask/epic/?id=" + epicTask2.getTaskId());
         assertEquals(0, taskManager.getAllSubTasks().size(), "задача не удалена");
     }
+
     @Test
     void testDELETETaskByIdShouldThrowExceptionWhenTaskIdIncorrect() {
         int taskId = 123456789;
@@ -434,6 +467,7 @@ class HttpTaskServerTest {
         assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), task3)
                 , "Временные метки не были удалены");
     }
+
     @Test
     void testDELETEAllEpicTasks() {
         taskManager.manageTaskObject(epicTask1);
@@ -446,6 +480,7 @@ class HttpTaskServerTest {
         tasks = taskManager.getAllEpicTasks();
         assertTrue(tasks.isEmpty(), "Удаление всех эпиков не удалось");
     }
+
     @Test
     void testDELETEAllSubTasks() {
 
@@ -471,6 +506,7 @@ class HttpTaskServerTest {
         assertTrue(taskTimeValidation(taskManager.getTimeStampsSet(), subTask31)
                 , "Временные метки не были удалены");
     }
+
     @Test
     void testDELETEAllTasksShouldThrowExceptionWhenTasksMapsIsEmpty() {
         HttpClientException ex1 = Assertions.assertThrows(
@@ -492,6 +528,7 @@ class HttpTaskServerTest {
         Assertions.assertEquals("Загрузка данных c сервера по ключу: subtask/не удалась. " +
                 "Код ответа: 404", ex3.getMessage());
     }
+
     public void POST(String key, String json) throws HttpClientException {
         URI url = URI.create(serverUrl + "/tasks/" + key);
         HttpRequest request = HttpRequest.newBuilder()
