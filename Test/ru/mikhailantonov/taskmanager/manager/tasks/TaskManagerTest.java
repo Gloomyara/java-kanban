@@ -1,12 +1,13 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
 import org.junit.jupiter.api.*;
+import ru.mikhailantonov.taskmanager.manager.tasks.TaskManager;
 import ru.mikhailantonov.taskmanager.task.EpicTask;
 import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
 import ru.mikhailantonov.taskmanager.util.FileManager;
-import ru.mikhailantonov.taskmanager.util.StatusType;
-import ru.mikhailantonov.taskmanager.util.TimeStampsCrossingException;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -212,16 +213,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void manageTaskShouldThrowExceptionWhenTaskIdIsNull() {
-
-        NullPointerException ex = Assertions.assertThrows(
-                NullPointerException.class,
-                () -> taskManager.manageTask(task1)
-        );
-        Assertions.assertEquals("Ошибка! taskId = null", ex.getMessage());
-    }
-
-    @Test
     void addNewEpicTask() {
         taskManager.manageTaskObject(epicTask2);
         final int epicTaskId = epicTask2.getTaskId();
@@ -261,16 +252,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals("Ошибка при обработке эпика! Невозможно обработать пустой объект задачи"
                 , ex.getMessage());
 
-    }
-
-    @Test
-    void manageEpicTaskShouldThrowExceptionWhenTaskIdIsNull() {
-
-        NullPointerException ex = Assertions.assertThrows(
-                NullPointerException.class,
-                () -> taskManager.manageEpicTask(epicTask1)
-        );
-        Assertions.assertEquals("Ошибка! taskId = null", ex.getMessage());
     }
 
     @Test
@@ -332,17 +313,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertEquals("Ошибка при обработке задачи!" +
                 " Невозможно обработать пустой объект задачи", ex.getMessage());
 
-    }
-
-    @Test
-    void manageSubTaskShouldThrowExceptionWhenTaskIdIsNull() {
-        taskManager.manageTaskObject(epicTask1);
-        subTask11.setEpicTaskId(epicTask1.getTaskId());
-        NullPointerException ex = Assertions.assertThrows(
-                NullPointerException.class,
-                () -> taskManager.manageSubTask(subTask11)
-        );
-        Assertions.assertEquals("Ошибка! taskId = null", ex.getMessage());
     }
 
     @Test
@@ -655,12 +625,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void deleteOneEpicSubTasksShouldReturnFalseIfTasksMapsIsEmpty() {
-
         taskManager.manageTaskObject(epicTask1);
         final int taskId = epicTask1.getTaskId();
         assertFalse(taskManager.deleteOneEpicSubTasks(taskId),
                 "Ошибка! метод deleteOneEpicSubTasks что то удалил в эпике с ид: " + taskId);
-
     }
 
 
@@ -831,7 +799,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void deleteAllEpicTasks() {
         taskManager.manageTaskObject(epicTask1);
-
         taskManager.manageTaskObject(epicTask2);
         taskManager.manageTaskObject(epicTask3);
         List<Task> tasks = taskManager.getAllEpicTasks();

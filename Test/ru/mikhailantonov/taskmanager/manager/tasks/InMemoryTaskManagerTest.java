@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
 import org.junit.jupiter.api.BeforeEach;
 

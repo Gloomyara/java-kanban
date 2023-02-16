@@ -1,9 +1,10 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
-import ru.mikhailantonov.taskmanager.task.*;
+import ru.mikhailantonov.taskmanager.task.EpicTask;
+import ru.mikhailantonov.taskmanager.task.SubTask;
+import ru.mikhailantonov.taskmanager.task.Task;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;

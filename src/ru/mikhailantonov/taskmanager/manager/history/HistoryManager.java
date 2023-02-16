@@ -1,6 +1,6 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.history;
 
-import ru.mikhailantonov.taskmanager.task.*;
+import ru.mikhailantonov.taskmanager.task.Task;
 
 import java.util.List;
 

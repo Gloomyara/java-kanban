@@ -1,8 +1,8 @@
 package ru.mikhailantonov.taskmanager.task;
 
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.TaskType;
 import ru.mikhailantonov.taskmanager.util.FileManager;
-import ru.mikhailantonov.taskmanager.util.StatusType;
-import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -14,6 +14,7 @@ import java.util.Objects;
  */
 
 public class Task {
+
     protected Integer taskId;
     protected String taskName;
     protected StatusType taskStatus;
@@ -26,6 +27,14 @@ public class Task {
 
     public Task(String taskName, String taskDescription) {
 
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        taskType = TaskType.TASK;
+    }
+
+    public Task(Integer taskId, String taskName, String taskDescription) {
+
+        this.taskId = taskId;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         taskType = TaskType.TASK;
@@ -66,6 +75,18 @@ public class Task {
         this.duration = duration.plusMinutes(durationInMinutes);
         taskType = TaskType.TASK;
     }
+
+    public Task(Integer taskId, String taskName, StatusType taskStatus, String taskDescription,
+                LocalDateTime startTime, Integer durationInMinutes) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.taskStatus = taskStatus;
+        this.taskDescription = taskDescription;
+        this.startTime = startTime;
+        this.duration = duration.plusMinutes(durationInMinutes);
+        taskType = TaskType.TASK;
+    }
+
     public TaskType getTaskType() {
         return taskType;
     }

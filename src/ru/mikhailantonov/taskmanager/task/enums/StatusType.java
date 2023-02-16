@@ -1,6 +1,4 @@
-package ru.mikhailantonov.taskmanager.util;
-
-import java.util.HashMap;
+package ru.mikhailantonov.taskmanager.task.enums;
 
 /**
  * Enum со статусами задач
@@ -22,8 +20,8 @@ public enum StatusType {
         return statusName;
     }
 
-    public static StatusType fromString(String str){
-        for (StatusType type: StatusType.values()){
+    public static StatusType fromString(String str) {
+        for (StatusType type : StatusType.values()) {
             if (type.getStatusName().equalsIgnoreCase(str)) return type;
         }
         return null;

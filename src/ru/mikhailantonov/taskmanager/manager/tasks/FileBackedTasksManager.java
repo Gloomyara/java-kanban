@@ -1,7 +1,14 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
-import ru.mikhailantonov.taskmanager.task.*;
-import ru.mikhailantonov.taskmanager.util.*;
+import ru.mikhailantonov.taskmanager.manager.history.HistoryManager;
+import ru.mikhailantonov.taskmanager.task.EpicTask;
+import ru.mikhailantonov.taskmanager.task.SubTask;
+import ru.mikhailantonov.taskmanager.task.Task;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.TaskType;
+import ru.mikhailantonov.taskmanager.util.FileManager;
+import ru.mikhailantonov.taskmanager.util.exceptions.ManagerSaveException;
+import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -12,9 +19,12 @@ import java.util.*;
  * Класс для обработки и хранения объектов задач в файле и/или создания задач из файла
  */
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File autoSave;
+    private File autoSave;
+
+    public FileBackedTasksManager() {
+    }
 
     //считываем таски
     public FileBackedTasksManager(File file) {
@@ -33,7 +43,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 list.add(line);
             }
             int i = 1;
-            if (i>=list.size()) {
+            if (i >= list.size()) {
                 throw new ManagerSaveException("Ошибка! Невозможно загрузить данные из пустого файла");
             }
             while (!list.get(i).isBlank()) {
@@ -49,14 +59,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
                 throw new ManagerSaveException("Не удалось загрузить список истории");
             }
         } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-            System.out.println("Произошла ошибка во время чтения файла.");
+            throw new ManagerSaveException("Произошла ошибка во время чтения файла.", e);
         }
         return ftm;
     }
 
     //Сохранить задачи и историю просмотров в файл
-    private void save() {
+    protected void save() {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(autoSave, StandardCharsets.UTF_8))) {
             var tasks = getAllTypesTasks();

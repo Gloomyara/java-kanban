@@ -1,7 +1,14 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
-import ru.mikhailantonov.taskmanager.task.*;
-import ru.mikhailantonov.taskmanager.util.*;
+import ru.mikhailantonov.taskmanager.manager.history.HistoryManager;
+import ru.mikhailantonov.taskmanager.task.EpicTask;
+import ru.mikhailantonov.taskmanager.task.SubTask;
+import ru.mikhailantonov.taskmanager.task.Task;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.TaskType;
+import ru.mikhailantonov.taskmanager.util.Managers;
+import ru.mikhailantonov.taskmanager.util.TimeStampsManager;
+import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -43,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     //вернуть историю просмотров
     @Override
-    public List<Task> getHistory() throws NullPointerException {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
@@ -84,14 +91,17 @@ public class InMemoryTaskManager implements TaskManager {
         if (epicObject == null) {
             throw new NullPointerException("Ошибка при обработке эпика! Невозможно обработать пустой объект задачи");
         }
-        Integer taskId = epicObject.getTaskId();
-        if (taskId == null) {
-            throw new NullPointerException("Ошибка! taskId = null");
+        //присвоить id
+        if (epicObject.getTaskId() == null) {
+            epicObject.setTaskId(id);
+            id = id + 1;
         }
+        Integer taskId = epicObject.getTaskId();
         if (!epicTaskMap.containsKey(taskId)) {
 
             epicObject.setTaskStatus(epicObject.epicStatusType());
             epicTaskMap.put(taskId, epicObject);
+
         } else {
 
             EpicTask epicTask = epicTaskMap.get(taskId);
@@ -114,16 +124,18 @@ public class InMemoryTaskManager implements TaskManager {
         if (subObject.getTaskStatus() == null) {
             subObject.setTaskStatus(StatusType.NEW);
         }
-        Integer taskId = subObject.getTaskId();
-        if (taskId == null) {
-            throw new NullPointerException("Ошибка! taskId = null");
+        //присвоить id
+        if (subObject.getTaskId() == null) {
+            subObject.setTaskId(id);
+            id = id + 1;
         }
+        Integer taskId = subObject.getTaskId();
         Integer epicTaskId = subObject.getEpicTaskId();
         if (!epicTaskMap.containsKey(epicTaskId)) {
             throw new NoSuchElementException("Ошибка! эпик задачи с таким ID нет.");
         } else {
             EpicTask epicTask = epicTaskMap.get(epicTaskId);
-            if (epicTask.getSubTaskMap().containsKey(taskId)) {
+            if (epicSubTaskIdMap.containsKey(taskId)) {
                 SubTask subTask = epicTask.getSubTaskMap().get(taskId);
                 if (!subTask.equals(subObject)) {
                     //проверка/обновление временных меток
@@ -169,10 +181,11 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskObject.getTaskStatus() == null) {
             taskObject.setTaskStatus(StatusType.NEW);
         }
-        Integer taskId = taskObject.getTaskId();
-        if (taskId == null) {
-            throw new NullPointerException("Ошибка! taskId = null");
+        if (taskObject.getTaskId() == null) {
+            taskObject.setTaskId(id);
+            id = id + 1;
         }
+        Integer taskId = taskObject.getTaskId();
         //обновление
         if (taskMap.containsKey(taskId)) {
 
@@ -515,7 +528,7 @@ public class InMemoryTaskManager implements TaskManager {
             for (EpicTask epicObject : epicTaskMap.values()) {
                 if (!epicObject.getSubTaskMap().isEmpty()) {
                     for (Task subTask : epicObject.getSubTaskMap().values()) {
-                        removeTimeStamps(timeStampsSet,subTask);
+                        removeTimeStamps(timeStampsSet, subTask);
                         historyManager.remove(subTask.getTaskId());
                         allTasksPrioritizedSet.remove(subTask);
                     }

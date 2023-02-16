@@ -1,8 +1,8 @@
 package ru.mikhailantonov.taskmanager.task;
 
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.TaskType;
 import ru.mikhailantonov.taskmanager.util.FileManager;
-import ru.mikhailantonov.taskmanager.util.StatusType;
-import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -19,6 +19,11 @@ public class EpicTask extends Task {
 
     public EpicTask(String taskName, String taskDescription) {
         super(taskName, taskDescription);
+        this.taskType = TaskType.EPIC;
+    }
+
+    public EpicTask(Integer taskId, String taskName, String taskDescription) {
+        super(taskId, taskName, taskDescription);
         this.taskType = TaskType.EPIC;
     }
 
@@ -142,6 +147,6 @@ public class EpicTask extends Task {
             result = startTime.format(FileManager.DATE_TIME_FORMATTER);
         }
         return result + "," + taskId + "," + taskType.getTaskTypeName() + "," + taskName + ","
-                + taskStatus.getStatusName() + "," + taskDescription+ "," + duration.toMinutes();
+                + taskStatus.getStatusName() + "," + taskDescription + "," + duration.toMinutes();
     }
 }

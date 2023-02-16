@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.util;
+package ru.mikhailantonov.taskmanager.util.exceptions;
 
 /**
  * собственное исключение для обработки ошибок во время сохранения данных
@@ -7,5 +7,8 @@ package ru.mikhailantonov.taskmanager.util;
 public class ManagerSaveException extends RuntimeException {
     public ManagerSaveException(final String message) {
         super(message);
+    }
+    public ManagerSaveException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

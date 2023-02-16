@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.util;
+package ru.mikhailantonov.taskmanager.task.enums;
 
 /**
  * Enum с типом задач
@@ -20,12 +20,13 @@ public enum TaskType {
         return taskTypeName;
     }
 
-    public static TaskType fromString(String str){
-        for (TaskType type: TaskType.values()){
+    public static TaskType fromString(String str) {
+        for (TaskType type : TaskType.values()) {
             if (type.getTaskTypeName().equalsIgnoreCase(str)) return type;
         }
         return null;
     }
+
     @Override
     public String toString() {
         return "Тип задачи: " + taskTypeName;

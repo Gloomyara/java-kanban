@@ -1,6 +1,11 @@
 package ru.mikhailantonov.taskmanager.util;
 
-import ru.mikhailantonov.taskmanager.manager.*;
+import ru.mikhailantonov.taskmanager.manager.history.HistoryManager;
+import ru.mikhailantonov.taskmanager.manager.history.InMemoryHistoryManager;
+import ru.mikhailantonov.taskmanager.manager.tasks.FileBackedTasksManager;
+import ru.mikhailantonov.taskmanager.manager.tasks.HttpTaskManager;
+import ru.mikhailantonov.taskmanager.manager.tasks.InMemoryTaskManager;
+import ru.mikhailantonov.taskmanager.manager.tasks.TaskManager;
 
 import java.io.IOException;
 
@@ -13,6 +18,14 @@ public class Managers {
 
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
+    }
+
+    public static HttpTaskManager getDefault(String serverUrl) {
+        return new HttpTaskManager(serverUrl);
+    }
+
+    public static HttpTaskManager getDefault(String serverUrl, String apiToken) {
+        return new HttpTaskManager(serverUrl, apiToken);
     }
 
     public static TaskManager getDefault(boolean isNew, String path) {

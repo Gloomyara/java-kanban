@@ -1,7 +1,6 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.history;
 
-import ru.mikhailantonov.taskmanager.task.*;
-import ru.mikhailantonov.taskmanager.util.Node;
+import ru.mikhailantonov.taskmanager.task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public List<Task> getHistory() throws NullPointerException {
+    public List<Task> getHistory() {
         return getTasks();
     }
 

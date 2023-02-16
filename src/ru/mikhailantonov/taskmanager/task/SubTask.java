@@ -1,8 +1,8 @@
 package ru.mikhailantonov.taskmanager.task;
 
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.TaskType;
 import ru.mikhailantonov.taskmanager.util.FileManager;
-import ru.mikhailantonov.taskmanager.util.StatusType;
-import ru.mikhailantonov.taskmanager.util.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,6 +35,13 @@ public class SubTask extends Task {
         this.taskType = TaskType.SUBTASK;
     }
 
+    public SubTask(Integer taskId, String taskName, StatusType taskStatus, String taskDescription,
+                   LocalDateTime startTime, Integer durationInMinutes, Integer epicTaskId) {
+        super(taskId, taskName, taskStatus, taskDescription, startTime, durationInMinutes);
+        this.epicTaskId = epicTaskId;
+        this.taskType = TaskType.SUBTASK;
+    }
+
     public Integer getEpicTaskId() {
         return epicTaskId;
     }
@@ -42,14 +49,17 @@ public class SubTask extends Task {
     public void setEpicTaskId(Integer epicTaskId) {
         this.epicTaskId = epicTaskId;
     }
+
     @Override
     public TaskType getTaskType() {
         return taskType;
     }
+
     @Override
-    public Duration getDuration(){
+    public Duration getDuration() {
         return duration;
     }
+
     @Override
     public int hashCode() {
         int hash = 17;

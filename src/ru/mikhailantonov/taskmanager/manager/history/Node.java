@@ -1,7 +1,8 @@
-package ru.mikhailantonov.taskmanager.util;
+package ru.mikhailantonov.taskmanager.manager.history;
 
 /**
  * Utility class для handmade linked-list в менеджере HistoryManager
+ *
  * @param <E>
  */
 public class Node<E> {
@@ -9,6 +10,7 @@ public class Node<E> {
     private Node<E> next;
 
     private Node<E> prev;
+
     public E getValue() {
         return value;
     }
@@ -32,7 +34,6 @@ public class Node<E> {
     public void setPrev(Node<E> prev) {
         this.prev = prev;
     }
-
 
 
     public Node(Node<E> prev, E value, Node<E> next) {

@@ -1,4 +1,4 @@
-package ru.mikhailantonov.taskmanager.util;
+package ru.mikhailantonov.taskmanager.util.exceptions;
 
 
 /**

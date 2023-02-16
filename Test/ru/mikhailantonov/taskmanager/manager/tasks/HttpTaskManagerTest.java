@@ -1,65 +1,61 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.mikhailantonov.taskmanager.util.ManagerSaveException;
+import ru.mikhailantonov.taskmanager.server.HttpTaskServer;
+import ru.mikhailantonov.taskmanager.server.KVServer;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 import ru.mikhailantonov.taskmanager.util.Managers;
-import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.util.exceptions.ManagerSaveException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.io.IOException;
 
-class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
+    KVServer kv;
 
     @BeforeEach
-    void createBackedTasksManager() {
-        taskManager = (FileBackedTasksManager) Managers.getDefault(true, true, "testautosave.csv");
+    void createManager() {
+
+        try {
+            kv = new KVServer();
+            kv.start();
+            taskManager = Managers.getDefault("http://localhost:8080");
+        } catch (IOException e) {
+            System.out.println(e.getMessage() + " || " + e.getCause());
+        }
     }
 
+    @AfterEach
+    void stopServers() {
+        kv.stop();
+    }
     @Test
-    void loadFromFileShouldThrowExceptionWhenHistoryIsEmpty() {
+    void GetAllTypeTasksShouldBeIsEmpty() {
+        HttpTaskManager taskManager1 = Managers.getDefault("http://localhost:8080",
+                taskManager.getAPI_TOKEN());
+        taskManager1.loadFromServer();
+        assertTrue(taskManager1.getAllTypesTasks().isEmpty(), "Список всех типов задач не пустой");
+    }
+    @Test
+    void HistoryShouldBeIsEmpty() {
         taskManager.manageTaskObject(task1);
         taskManager.manageTaskObject(epicTask1);
         subTask11.setEpicTaskId(epicTask1.getTaskId());
         taskManager.manageTaskObject(subTask11);
 
-        ManagerSaveException ex = Assertions.assertThrows(
-                ManagerSaveException.class,
-                () -> FileBackedTasksManager.loadFromFile(taskManager.getAutoSave())
-        );
-        Assertions.assertEquals("Не удалось загрузить список истории", ex.getMessage());
+        HttpTaskManager taskManager2 = Managers.getDefault("http://localhost:8080",
+                taskManager.getAPI_TOKEN());
+        taskManager2.loadFromServer();
+        assertTrue(taskManager2.getHistory().isEmpty(), "Список с историей не пустой");
     }
 
     @Test
-    void loadFromFileShouldThrowExceptionWhenFileIsEmpty() {
-
-        ManagerSaveException ex = Assertions.assertThrows(
-                ManagerSaveException.class,
-                () -> FileBackedTasksManager.loadFromFile(taskManager.getAutoSave())
-        );
-        Assertions.assertEquals("Не удалось загрузить список истории", ex.getMessage());
-    }
-
-    @Test
-    void loadFromFileWithEmptyEpic() {
-        taskManager.manageTaskObject(task1);
-        taskManager.manageTaskObject(epicTask1);
-        taskManager.getTaskObjectById(task1.getTaskId());
-        taskManager.getTaskObjectById(epicTask1.getTaskId());
-
-        assertEquals(2, taskManager.getHistory().size(), "неверное количество задач в истории");
-
-        FileBackedTasksManager taskManagerLoaded = FileBackedTasksManager.loadFromFile(taskManager.getAutoSave());
-
-        assertEquals(2, taskManagerLoaded.getHistory().size(), "неверное количество задач в истории");
-        assertEquals(task1, taskManagerLoaded.getTaskObjectById(task1.getTaskId())
-                , "загруженная задача не соответствует сохраненной");
-        assertEquals(epicTask1, taskManagerLoaded.getTaskObjectById(epicTask1.getTaskId())
-                , "загруженный эпик не соответствует сохраненному");
-    }
-
-    @Test
-    void loadFromFile() {
+    void loadFromServer() {
         task1.setTaskStatus(StatusType.DONE);
         taskManager.manageTaskObject(task1);
         taskManager.manageTaskObject(epicTask1);
@@ -88,7 +84,9 @@ class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager>
         taskManager.getTaskObjectById(task1.getTaskId());
         assertEquals(5, taskManager.getHistory().size(), "неверное количество задач в истории");
 
-        FileBackedTasksManager taskManagerLoaded = FileBackedTasksManager.loadFromFile(taskManager.getAutoSave());
+        HttpTaskManager taskManagerLoaded = Managers.getDefault("http://localhost:8080",
+                taskManager.getAPI_TOKEN());
+        taskManagerLoaded.loadFromServer();
         assertEquals(5, taskManagerLoaded.getHistory().size(), "неверное количество задач в истории");
         assertEquals(task1, taskManagerLoaded.getTaskObjectById(task1.getTaskId())
                 , "загруженная задача не соответствует сохраненной");

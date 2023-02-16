@@ -2,7 +2,7 @@ package ru.mikhailantonov.taskmanager.task;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 
 import static org.junit.jupiter.api.Assertions.*;
 

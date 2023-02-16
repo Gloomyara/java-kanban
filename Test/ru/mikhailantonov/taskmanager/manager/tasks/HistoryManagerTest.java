@@ -1,10 +1,12 @@
-package ru.mikhailantonov.taskmanager.manager;
+package ru.mikhailantonov.taskmanager.manager.tasks;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.mikhailantonov.taskmanager.manager.history.HistoryManager;
+import ru.mikhailantonov.taskmanager.manager.history.InMemoryHistoryManager;
 import ru.mikhailantonov.taskmanager.task.Task;
-import ru.mikhailantonov.taskmanager.util.StatusType;
+import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 
 import java.util.List;
 
