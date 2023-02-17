@@ -40,44 +40,29 @@ public class HttpTaskManager extends FileBackedTasksManager {
             throws JsonSyntaxException, TimeStampsCrossingException, NoSuchElementException {
 
         try {
-            JsonElement jsonElementTasks = JsonParser.parseString(client.load(TASKS.getName()));
-            if (jsonElementTasks.isJsonArray()) {
                 Type taskType = new TypeToken<List<Task>>() {}.getType();
-                List<Task> tasksList = gson.fromJson(jsonElementTasks.getAsJsonArray(), taskType);
+                List<Task> tasksList = gson.fromJson(client.load(TASKS.getName()), taskType);
                 for (Task task : tasksList) {
                     manageTask(task);
                 }
-            } else {
-                throw new JsonSyntaxException("Ошибка при загрузке задач с сервера");
-            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
         try {
-            JsonElement jsonElementEpics = JsonParser.parseString(client.load(EPICS.getName()));
-            if (jsonElementEpics.isJsonArray()) {
                 Type taskType = new TypeToken<List<EpicTask>>() {}.getType();
-                List<EpicTask> tasksList = gson.fromJson(jsonElementEpics.getAsJsonArray(), taskType);
+                List<EpicTask> tasksList = gson.fromJson(client.load(EPICS.getName()), taskType);
                 for (EpicTask task : tasksList) {
                     manageEpicTask(task);
                 }
-            } else {
-                throw new JsonSyntaxException("Ошибка при загрузке эпиков с сервера");
-            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
         try {
-            JsonElement jsonElementSubTasks = JsonParser.parseString(client.load(SUBTASKS.getName()));
-            if (jsonElementSubTasks.isJsonArray()) {
                 Type taskType = new TypeToken<List<SubTask>>() {}.getType();
-                List<SubTask> tasksList = gson.fromJson(jsonElementSubTasks.getAsJsonArray(), taskType);
+                List<SubTask> tasksList = gson.fromJson(client.load(SUBTASKS.getName()), taskType);
                 for (SubTask task : tasksList) {
                     manageSubTask(task);
                 }
-            } else {
-                throw new JsonSyntaxException("Ошибка при загрузке подзадач с сервера");
-            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }

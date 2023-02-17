@@ -343,11 +343,9 @@ class HttpTaskServerTest {
         } catch (IOException | InterruptedException e) {
             throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась", e);
         }
-        JsonElement jsonElementTasks = JsonParser.parseString(response);
-        JsonArray array = jsonElementTasks.getAsJsonArray();
 
         Type taskType = new TypeToken<List<Task>>() {}.getType();
-        List<Task> tasks = gson.fromJson(array, taskType);
+        List<Task> tasks = gson.fromJson(response, taskType);
 
         for (Task task : tasks) {
             System.out.println(task);
