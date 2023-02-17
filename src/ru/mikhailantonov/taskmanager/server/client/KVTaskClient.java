@@ -3,12 +3,11 @@ package ru.mikhailantonov.taskmanager.server.client;
 import ru.mikhailantonov.taskmanager.server.exceptions.HttpClientException;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import static ru.mikhailantonov.taskmanager.server.enums.HttpCode.SUCCESS;
 
 public class KVTaskClient {
     private final HttpClient kvServerClient = HttpClient.newHttpClient();
@@ -47,7 +46,7 @@ public class KVTaskClient {
         try {
             HttpResponse<String> resp = kvServerClient.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code != SUCCESS.getCode()) {
+            if (code != HttpURLConnection.HTTP_OK) {
                 throw new HttpClientException("Загрузка данных на сервер по ключу: " + key +
                         "не удалась. Код ответа: " + code);
             }
@@ -65,7 +64,7 @@ public class KVTaskClient {
         try {
             HttpResponse<String> resp = kvServerClient.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code == SUCCESS.getCode()) return resp.body();
+            if (code == HttpURLConnection.HTTP_OK) return resp.body();
             throw new HttpClientException("Загрузка данных c сервера по ключу: " + key +
                     "не удалась. Код ответа: " + code);
         } catch (IOException | InterruptedException e) {

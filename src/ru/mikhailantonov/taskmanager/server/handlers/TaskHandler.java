@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.mikhailantonov.taskmanager.manager.tasks.TaskManager;
+import ru.mikhailantonov.taskmanager.server.enums.HttpEndPoint;
 import ru.mikhailantonov.taskmanager.server.enums.HttpMethod;
 import ru.mikhailantonov.taskmanager.server.exceptions.EndPointException;
 import ru.mikhailantonov.taskmanager.task.EpicTask;
@@ -15,14 +16,13 @@ import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static ru.mikhailantonov.taskmanager.server.enums.HttpCode.*;
-
 
 public class TaskHandler implements HttpHandler {
     private final Gson gson;
@@ -41,10 +41,10 @@ public class TaskHandler implements HttpHandler {
             String requestMethod = exchange.getRequestMethod();
             if (exchange.getRequestURI().getPath().endsWith("/tasks/")&&requestMethod.equals("GET")){
                 String tasksJson = gson.toJson(taskManager.getPrioritizedTasks());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 return;
             }
-            String endPoint = exchange.getRequestURI().getPath().split("/")[2].toLowerCase();
+            HttpEndPoint endPoint = HttpEndPoint.fromString(exchange.getRequestURI().getPath().split("/")[2]);
             Optional<Integer> optionalTaskId;
             Integer taskId = null;
             boolean isContainsId = exchange.getRequestURI().toString().contains("?id=");
@@ -75,45 +75,45 @@ public class TaskHandler implements HttpHandler {
                     }
                     break;
                 default:
-                    writeResponse(exchange, METHOD_NOT_ALLOWED.getCode(),
+                    writeResponse(exchange, HttpURLConnection.HTTP_BAD_METHOD,
                             "Метод не поддерживается" + requestMethod);
             }
         } catch (NoSuchElementException e) {
-            writeResponse(exchange, NOT_FOUND.getCode(), e.getMessage());
+            writeResponse(exchange, HttpURLConnection.HTTP_NOT_FOUND, e.getMessage());
         } catch (IllegalArgumentException | EndPointException | IndexOutOfBoundsException e) {
-            writeResponse(exchange, BAD_REQUEST.getCode(), e.getMessage());
+            writeResponse(exchange, HttpURLConnection.HTTP_BAD_REQUEST, e.getMessage());
         } catch (JsonSyntaxException e) {
-            writeResponse(exchange, BAD_REQUEST.getCode(), "Получен некорректный JSON");
+            writeResponse(exchange, HttpURLConnection.HTTP_BAD_REQUEST, "Получен некорректный JSON");
         } catch (Exception e) {
-            writeResponse(exchange, INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
+            writeResponse(exchange, HttpURLConnection.HTTP_INTERNAL_ERROR, e.getMessage());
         } finally {
             exchange.close();
         }
     }
 
-    private void handleGetTasksById(HttpExchange exchange, String endPoint, Integer taskId)
+    private void handleGetTasksById(HttpExchange exchange, HttpEndPoint endPoint, Integer taskId)
             throws IOException, EndPointException, NoSuchElementException,
             IllegalArgumentException, JsonSyntaxException {
 
         String tasksJson;
         try {
             switch (endPoint) {
-                case ("task"):
+                case TASK_ENDPOINT:
                     tasksJson = gson.toJson(taskManager.getTask(taskId));
-                    writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                    writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                     break;
-                case ("subtask"):
+                case SUBTASK_ENDPOINT:
                     if (exchange.getRequestURI().toString().contains("epic")) {
                         tasksJson = gson.toJson(taskManager.getOneEpicSubTasks(taskId));
-                        writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                        writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                         break;
                     }
                     tasksJson = gson.toJson(taskManager.getSubTask(taskId));
-                    writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                    writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                     break;
-                case ("epic"):
+                case EPIC_ENDPOINT:
                     tasksJson = gson.toJson(taskManager.getEpicTask(taskId));
-                    writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                    writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                     break;
                 default:
                     throw new EndPointException("Ошибка при обработке метода GET!" +
@@ -124,27 +124,27 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    private void handleGetTasks(HttpExchange exchange, String endPoint)
+    private void handleGetTasks(HttpExchange exchange, HttpEndPoint endPoint)
             throws IOException, EndPointException, JsonSyntaxException {
 
         String tasksJson;
         switch (endPoint) {
 
-            case ("task"):
+            case TASK_ENDPOINT:
                 tasksJson = gson.toJson(taskManager.getAllTasks());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 break;
-            case ("subtask"):
+            case SUBTASK_ENDPOINT:
                 tasksJson = gson.toJson(taskManager.getAllSubTasks());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 break;
-            case ("epic"):
+            case EPIC_ENDPOINT:
                 tasksJson = gson.toJson(taskManager.getAllEpicTasks());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 break;
-            case ("history"):
+            case HISTORY_ENDPOINT:
                 tasksJson = gson.toJson(taskManager.getHistory());
-                writeResponse(exchange, SUCCESS.getCode(), tasksJson);
+                writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 break;
             default:
                 throw new EndPointException("Ошибка при обработке метода GET!" +
@@ -152,30 +152,30 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    private void handleDeleteTasksById(HttpExchange exchange, String endPoint, Integer taskId)
+    private void handleDeleteTasksById(HttpExchange exchange, HttpEndPoint endPoint, Integer taskId)
             throws IOException, EndPointException, NoSuchElementException,
             IllegalArgumentException {
 
         try {
             switch (endPoint) {
-                case ("task"):
+                case TASK_ENDPOINT:
                     taskManager.deleteTask(taskId);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Задача с id: " + taskId + " успешно удалена.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Задача с id: " + taskId + " успешно удалена.");
                     break;
-                case ("subtask"):
+                case SUBTASK_ENDPOINT:
                     if (exchange.getRequestURI().toString().contains("epic")) {
                         if (taskManager.deleteOneEpicSubTasks(taskId)) {
-                            writeResponse(exchange, ACCEPTED.getCode(), "В эпике с ID: " + taskId + " все подзадачи удалены.");
+                            writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "В эпике с ID: " + taskId + " все подзадачи удалены.");
                             break;
                         }
                         throw new NoSuchElementException("В эпике с ID: " + taskId + " нечего удалять.");
                     }
                     taskManager.deleteSubTask(taskId);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Подзадача с id: " + taskId + " успешно удалена.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Подзадача с id: " + taskId + " успешно удалена.");
                     break;
-                case ("epic"):
+                case EPIC_ENDPOINT:
                     taskManager.deleteEpicTask(taskId);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Эпик с id: " + taskId + " успешно удален.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Эпик с id: " + taskId + " успешно удален.");
                     break;
                 default:
                     throw new EndPointException("Ошибка при обработке метода DELETE!" +
@@ -186,25 +186,25 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    private void handleDeleteTasks(HttpExchange exchange, String endPoint)
+    private void handleDeleteTasks(HttpExchange exchange, HttpEndPoint endPoint)
             throws IOException, EndPointException, NoSuchElementException {
 
         switch (endPoint) {
-            case ("task"):
+            case TASK_ENDPOINT:
                 if (taskManager.deleteAllTasks()) {
-                    writeResponse(exchange, ACCEPTED.getCode(), "Все задачи удалены.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Все задачи удалены.");
                     break;
                 }
                 throw new NoSuchElementException("Нечего удалять.");
-            case ("subtask"):
+            case SUBTASK_ENDPOINT:
                 if (taskManager.deleteAllSubTasks()) {
-                    writeResponse(exchange, ACCEPTED.getCode(), "Все подзадачи удалены.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Все подзадачи удалены.");
                     break;
                 }
                 throw new NoSuchElementException("Нечего удалять.");
-            case ("epic"):
+            case EPIC_ENDPOINT:
                 if (taskManager.deleteAllEpicTasks()) {
-                    writeResponse(exchange, ACCEPTED.getCode(), "Все эпики удалены.");
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Все эпики удалены.");
                     break;
                 }
                 throw new NoSuchElementException("Нечего удалять.");
@@ -214,48 +214,47 @@ public class TaskHandler implements HttpHandler {
         }
     }
 
-    private void handlePostTasks(HttpExchange exchange, String endPoint) throws IOException, EndPointException,
+    private void handlePostTasks(HttpExchange exchange, HttpEndPoint endPoint) throws IOException, EndPointException,
             NoSuchElementException, IllegalArgumentException, JsonSyntaxException {
 
-        InputStream inputStream = exchange.getRequestBody();
+        try (InputStream inputStream = exchange.getRequestBody()) {
         String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        try {
             switch (endPoint) {
-                case ("task"):
+                case TASK_ENDPOINT:
                     Task task = gson.fromJson(body, Task.class);
                     if (task.getTaskId() == null) {
                         taskManager.manageTask(task);
-                        writeResponse(exchange, CREATED.getCode(), "Задача успешно добавлена. " +
+                        writeResponse(exchange, HttpURLConnection.HTTP_CREATED, "Задача успешно добавлена. " +
                                 "Присвоено id: " + task.getTaskId());
                         break;
                     }
                     taskManager.manageTask(task);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Задача c id: " +
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Задача c id: " +
                             task.getTaskId() + " успешно обновлена.");
                     break;
-                case ("subtask"):
+                case SUBTASK_ENDPOINT:
                     SubTask subTask = gson.fromJson(body, SubTask.class);
                     if (subTask.getTaskId() == null) {
                         taskManager.manageSubTask(subTask);
-                        writeResponse(exchange, CREATED.getCode(), "Подзадача успешно добавлена. " +
+                        writeResponse(exchange, HttpURLConnection.HTTP_CREATED, "Подзадача успешно добавлена. " +
                                 "Присвоено id:" + subTask.getTaskId());
                         break;
                     }
                     taskManager.manageSubTask(subTask);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Подзадача c id: " +
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Подзадача c id: " +
                             subTask.getTaskId() + " успешно обновлена.");
                     break;
 
-                case ("epic"):
+                case EPIC_ENDPOINT:
                     EpicTask epicTask = gson.fromJson(body, EpicTask.class);
                     if (epicTask.getTaskId() == null) {
                         taskManager.manageEpicTask(epicTask);
-                        writeResponse(exchange, CREATED.getCode(), "Эпик успешно добавлен. " +
+                        writeResponse(exchange, HttpURLConnection.HTTP_CREATED, "Эпик успешно добавлен. " +
                                 "Присвоено id: " + epicTask.getTaskId());
                         break;
                     }
                     taskManager.manageEpicTask(epicTask);
-                    writeResponse(exchange, ACCEPTED.getCode(), "Эпик c id: " +
+                    writeResponse(exchange, HttpURLConnection.HTTP_ACCEPTED, "Эпик c id: " +
                             epicTask.getTaskId() + "успешно обновлен.");
                     break;
                 default:

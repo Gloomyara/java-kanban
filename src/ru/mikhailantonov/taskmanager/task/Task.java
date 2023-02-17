@@ -143,6 +143,7 @@ public class Task {
         return endTime = startTime.plus(duration);
     }
 
+
     @Override
     public int hashCode() {
         int hash = 17;

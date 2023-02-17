@@ -1,6 +1,7 @@
 package ru.mikhailantonov.taskmanager.server;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,20 +13,20 @@ import ru.mikhailantonov.taskmanager.task.EpicTask;
 import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
-import ru.mikhailantonov.taskmanager.task.enums.TaskType;
+import ru.mikhailantonov.taskmanager.server.handlers.TaskDeserializer;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.mikhailantonov.taskmanager.server.enums.HttpCode.*;
 import static ru.mikhailantonov.taskmanager.util.TimeStampsManager.taskTimeValidation;
 
 class HttpTaskServerTest {
@@ -49,9 +50,13 @@ class HttpTaskServerTest {
 
     @BeforeEach
     void createSomeTasks() {
-
+        TaskDeserializer deserializer = new TaskDeserializer("taskType");
+        deserializer.registerTaskType("TASK", Task.class);
+        deserializer.registerTaskType("SUBTASK", SubTask.class);
+        deserializer.registerTaskType("EPIC", EpicTask.class);
         gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .registerTypeAdapter(Task.class, deserializer)
                 .create();
 
         task1 = new Task("Test NewTask1", "Test NewTask1 description");
@@ -330,7 +335,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code == SUCCESS.getCode()) {
+            if (code == HttpURLConnection.HTTP_OK) {
                 response =  resp.body();
             } else {
                 throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
@@ -340,28 +345,15 @@ class HttpTaskServerTest {
         }
         JsonElement jsonElementTasks = JsonParser.parseString(response);
         JsonArray array = jsonElementTasks.getAsJsonArray();
-        List<Task> sortedTasks = new ArrayList<>();
-        for (int i = 0; i < array.size(); i++) {
-            JsonObject jsonObject = array.get(i).getAsJsonObject();
-            TaskType type = TaskType.valueOf(jsonObject.get("taskType").getAsString());
 
-            switch (type) {
-                case TASK:
-                    sortedTasks.add(gson.fromJson(jsonObject, Task.class));
-                    break;
-                case SUBTASK:
-                    sortedTasks.add(gson.fromJson(jsonObject, SubTask.class));
-                    break;
-                case EPIC:
-                    sortedTasks.add(gson.fromJson(jsonObject, EpicTask.class));
-                    break;
-            }
-        }
-        for (Task task : sortedTasks) {
+        Type taskType = new TypeToken<List<Task>>(){}.getType();
+        List<Task> tasks = gson.fromJson(array, taskType);
+
+        for (Task task : tasks) {
             System.out.println(task);
         }
-        assertEquals(9, sortedTasks.size(), "Неверное количество задач");
-        assertEquals(sortedTasks.get(0), taskManager.getPrioritizedTasks().first(), "Задачи не совпадают");
+        assertEquals(9, tasks.size(), "Неверное количество задач");
+        assertEquals(tasks.get(0), taskManager.getPrioritizedTasks().first(), "Задачи не совпадают");
     }
 
     @Test
@@ -375,7 +367,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code == SUCCESS.getCode()) {
+            if (code == HttpURLConnection.HTTP_OK) {
                 response =  resp.body();
             } else {
                 throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
@@ -539,7 +531,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code != CREATED.getCode() && code != ACCEPTED.getCode()) {
+            if (code != HttpURLConnection.HTTP_CREATED && code != HttpURLConnection.HTTP_ACCEPTED) {
                 throw new HttpClientException("Загрузка данных на сервер по ключу: " + key +
                         "не удалась. Код ответа: " + code);
             }
@@ -557,7 +549,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code == SUCCESS.getCode()) return resp.body();
+            if (code == HttpURLConnection.HTTP_OK) return resp.body();
             throw new HttpClientException("Загрузка данных c сервера по ключу: " + key +
                     "не удалась. Код ответа: " + code);
         } catch (IOException | InterruptedException e) {
@@ -574,7 +566,7 @@ class HttpTaskServerTest {
         try {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
-            if (code == ACCEPTED.getCode()) return resp.body();
+            if (code == HttpURLConnection.HTTP_ACCEPTED) return resp.body();
             throw new HttpClientException("Загрузка данных c сервера по ключу: " + key +
                     "не удалась. Код ответа: " + code);
         } catch (IOException | InterruptedException e) {
