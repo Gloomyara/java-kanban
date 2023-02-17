@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import ru.mikhailantonov.taskmanager.server.client.KVTaskClient;
 import ru.mikhailantonov.taskmanager.server.exceptions.HttpClientException;
 import ru.mikhailantonov.taskmanager.server.handlers.LocalDateTimeTypeAdapter;
+import ru.mikhailantonov.taskmanager.server.handlers.TaskDeserializer;
 import ru.mikhailantonov.taskmanager.task.EpicTask;
 import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
@@ -23,16 +24,26 @@ public class HttpTaskManager extends FileBackedTasksManager {
     private final Gson gson;
 
     public HttpTaskManager(String serverUrl) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
-        gson = gsonBuilder.create();
+        TaskDeserializer deserializer = new TaskDeserializer("taskType");
+        deserializer.registerTaskType("TASK", Task.class);
+        deserializer.registerTaskType("SUBTASK", SubTask.class);
+        deserializer.registerTaskType("EPIC", EpicTask.class);
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .registerTypeAdapter(Task.class, deserializer)
+                .create();
         client = new KVTaskClient(serverUrl);
     }
 
     public HttpTaskManager(String serverUrl, String apiToken) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter());
-        gson = gsonBuilder.create();
+        TaskDeserializer deserializer = new TaskDeserializer("taskType");
+        deserializer.registerTaskType("TASK", Task.class);
+        deserializer.registerTaskType("SUBTASK", SubTask.class);
+        deserializer.registerTaskType("EPIC", EpicTask.class);
+        gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeTypeAdapter())
+                .registerTypeAdapter(Task.class, deserializer)
+                .create();
         client = new KVTaskClient(serverUrl, apiToken);
     }
 
@@ -40,41 +51,37 @@ public class HttpTaskManager extends FileBackedTasksManager {
             throws JsonSyntaxException, TimeStampsCrossingException, NoSuchElementException {
 
         try {
-                Type taskType = new TypeToken<List<Task>>() {}.getType();
-                List<Task> tasksList = gson.fromJson(client.load(TASKS.getName()), taskType);
-                for (Task task : tasksList) {
-                    manageTask(task);
-                }
+            Type taskType = new TypeToken<List<Task>>() {}.getType();
+            List<Task> tasksList = gson.fromJson(client.load(TASKS.getName()), taskType);
+            for (Task task : tasksList) {
+                manageTask(task);
+            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
         try {
-                Type taskType = new TypeToken<List<EpicTask>>() {}.getType();
-                List<EpicTask> tasksList = gson.fromJson(client.load(EPICS.getName()), taskType);
-                for (EpicTask task : tasksList) {
-                    manageEpicTask(task);
-                }
+            Type taskType = new TypeToken<List<EpicTask>>() {}.getType();
+            List<EpicTask> tasksList = gson.fromJson(client.load(EPICS.getName()), taskType);
+            for (EpicTask task : tasksList) {
+                manageEpicTask(task);
+            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
         try {
-                Type taskType = new TypeToken<List<SubTask>>() {}.getType();
-                List<SubTask> tasksList = gson.fromJson(client.load(SUBTASKS.getName()), taskType);
-                for (SubTask task : tasksList) {
-                    manageSubTask(task);
-                }
+            Type taskType = new TypeToken<List<SubTask>>() {}.getType();
+            List<SubTask> tasksList = gson.fromJson(client.load(SUBTASKS.getName()), taskType);
+            for (SubTask task : tasksList) {
+                manageSubTask(task);
+            }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
         try {
-            JsonElement jsonElementHistory = JsonParser.parseString(client.load(HISTORY.getName()));
-            if (jsonElementHistory.isJsonArray()) {
-                Task[] historyArray = gson.fromJson(jsonElementHistory.getAsJsonArray(), Task[].class);
-                for (Task task : historyArray) {
-                    getTaskObjectById(task.getTaskId());
-                }
-            } else {
-                throw new JsonSyntaxException("Ошибка при загрузке истории с сервера");
+            Type taskType = new TypeToken<List<Task>>() {}.getType();
+            List<Task> history = gson.fromJson(client.load(HISTORY.getName()), taskType);
+            for (Task task : history) {
+                historyManager.add(task);
             }
         } catch (HttpClientException | JsonSyntaxException | TimeStampsCrossingException | NullPointerException e) {
             System.out.println(e.getMessage());
