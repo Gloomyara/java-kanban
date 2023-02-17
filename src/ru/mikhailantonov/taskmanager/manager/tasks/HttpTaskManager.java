@@ -1,6 +1,7 @@
 package ru.mikhailantonov.taskmanager.manager.tasks;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import ru.mikhailantonov.taskmanager.server.client.KVTaskClient;
 import ru.mikhailantonov.taskmanager.server.exceptions.HttpClientException;
 import ru.mikhailantonov.taskmanager.server.handlers.LocalDateTimeTypeAdapter;
@@ -9,7 +10,9 @@ import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
 import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException;
 
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static ru.mikhailantonov.taskmanager.server.enums.KVKeys.*;
@@ -39,8 +42,9 @@ public class HttpTaskManager extends FileBackedTasksManager {
         try {
             JsonElement jsonElementTasks = JsonParser.parseString(client.load(TASKS.getName()));
             if (jsonElementTasks.isJsonArray()) {
-                Task[] tasksArray = gson.fromJson(jsonElementTasks.getAsJsonArray(), Task[].class);
-                for (Task task : tasksArray) {
+                Type taskType = new TypeToken<List<Task>>() {}.getType();
+                List<Task> tasksList = gson.fromJson(jsonElementTasks.getAsJsonArray(), taskType);
+                for (Task task : tasksList) {
                     manageTask(task);
                 }
             } else {
@@ -52,8 +56,9 @@ public class HttpTaskManager extends FileBackedTasksManager {
         try {
             JsonElement jsonElementEpics = JsonParser.parseString(client.load(EPICS.getName()));
             if (jsonElementEpics.isJsonArray()) {
-                EpicTask[] tasksArray = gson.fromJson(jsonElementEpics.getAsJsonArray(), EpicTask[].class);
-                for (EpicTask task : tasksArray) {
+                Type taskType = new TypeToken<List<EpicTask>>() {}.getType();
+                List<EpicTask> tasksList = gson.fromJson(jsonElementEpics.getAsJsonArray(), taskType);
+                for (EpicTask task : tasksList) {
                     manageEpicTask(task);
                 }
             } else {
@@ -65,8 +70,9 @@ public class HttpTaskManager extends FileBackedTasksManager {
         try {
             JsonElement jsonElementSubTasks = JsonParser.parseString(client.load(SUBTASKS.getName()));
             if (jsonElementSubTasks.isJsonArray()) {
-                SubTask[] tasksArray = gson.fromJson(jsonElementSubTasks.getAsJsonArray(), SubTask[].class);
-                for (SubTask task : tasksArray) {
+                Type taskType = new TypeToken<List<SubTask>>() {}.getType();
+                List<SubTask> tasksList = gson.fromJson(jsonElementSubTasks.getAsJsonArray(), taskType);
+                for (SubTask task : tasksList) {
                     manageSubTask(task);
                 }
             } else {
