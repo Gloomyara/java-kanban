@@ -1,7 +1,6 @@
 package ru.mikhailantonov.taskmanager.server.handlers;
 
 import com.google.gson.*;
-import ru.mikhailantonov.taskmanager.server.handlers.LocalDateTimeTypeAdapter;
 import ru.mikhailantonov.taskmanager.task.Task;
 
 import java.lang.reflect.Type;

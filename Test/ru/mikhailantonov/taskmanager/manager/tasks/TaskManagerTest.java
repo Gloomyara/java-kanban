@@ -1,12 +1,13 @@
 package ru.mikhailantonov.taskmanager.manager.tasks;
 
-import org.junit.jupiter.api.*;
-import ru.mikhailantonov.taskmanager.manager.tasks.TaskManager;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.mikhailantonov.taskmanager.task.EpicTask;
 import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
-import ru.mikhailantonov.taskmanager.util.FileManager;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.util.FileManager;
 import ru.mikhailantonov.taskmanager.util.exceptions.TimeStampsCrossingException;
 
 import java.time.Duration;
@@ -866,6 +867,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.manageTaskObject(task1);
         assertFalse(taskTimeValidation(taskManager.getTimeStampsSet(), task1), "Временные не метки сохранены");
     }
+
     @Test
     void shouldThrowExceptionWhenTimeStampsIsCrossing() {
         task1.setDuration(Duration.ofMinutes(45));

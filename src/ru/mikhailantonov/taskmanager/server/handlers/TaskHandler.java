@@ -39,7 +39,7 @@ public class TaskHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         try {
             String requestMethod = exchange.getRequestMethod();
-            if (exchange.getRequestURI().getPath().endsWith("/tasks/")&&requestMethod.equals("GET")){
+            if (exchange.getRequestURI().getPath().endsWith("/tasks/") && requestMethod.equals("GET")) {
                 String tasksJson = gson.toJson(taskManager.getPrioritizedTasks());
                 writeResponse(exchange, HttpURLConnection.HTTP_OK, tasksJson);
                 return;
@@ -218,7 +218,7 @@ public class TaskHandler implements HttpHandler {
             NoSuchElementException, IllegalArgumentException, JsonSyntaxException {
 
         try (InputStream inputStream = exchange.getRequestBody()) {
-        String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
             switch (endPoint) {
                 case TASK_ENDPOINT:
                     Task task = gson.fromJson(body, Task.class);

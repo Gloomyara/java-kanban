@@ -17,11 +17,6 @@ public class HttpTaskServer {
         server.bind(new InetSocketAddress("localhost", PORT), 0);
         TaskHandler taskHandler = new TaskHandler(taskManager);
         server.createContext("/tasks/", taskHandler);
-
-// можно сделать через 1 путь все
-// '/tasks/task?id=',/tasks/subtask?id=',/tasks/epic?id='
-// ,/tasks/subtask?epicid='(вместо /subtask/epic?id=)
-// не знаю чего они там курят, если нужно будет переделаю...
     }
 
     public void start() {

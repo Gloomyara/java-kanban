@@ -1,14 +1,11 @@
 package ru.mikhailantonov.taskmanager.manager.tasks;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.mikhailantonov.taskmanager.server.HttpTaskServer;
 import ru.mikhailantonov.taskmanager.server.KVServer;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 import ru.mikhailantonov.taskmanager.util.Managers;
-import ru.mikhailantonov.taskmanager.util.exceptions.ManagerSaveException;
 
 import java.io.IOException;
 
@@ -34,6 +31,7 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
     void stopServers() {
         kv.stop();
     }
+
     @Test
     void GetAllTypeTasksShouldBeIsEmpty() {
         HttpTaskManager taskManager1 = Managers.getDefault("http://localhost:8080",
@@ -41,6 +39,7 @@ class HttpTaskManagerTest extends TaskManagerTest<HttpTaskManager> {
         taskManager1.loadFromServer();
         assertTrue(taskManager1.getAllTypesTasks().isEmpty(), "Список всех типов задач не пустой");
     }
+
     @Test
     void HistoryShouldBeIsEmpty() {
         taskManager.manageTaskObject(task1);

@@ -4,13 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EpicTaskTest {
     EpicTask testEpicTask;
     SubTask testSubTask1;
     SubTask testSubTask2;
     SubTask testSubTask3;
+
     @BeforeEach
     void createNewEpicTaskAndSomeSubTasks() {
         testEpicTask = new EpicTask("Эпик1", "aa");
@@ -22,6 +24,7 @@ class EpicTaskTest {
         testSubTask3 = new SubTask("Э1 ПодЗадача3", StatusType.NEW, "asdf", 1);
         testSubTask3.setTaskId(4);
     }
+
     //Когда нет подзадач
     @Test
     void epicStatusTypeShouldBeNewWhenSubTaskMapIsEmpty() {
@@ -29,6 +32,7 @@ class EpicTaskTest {
         testEpicTask.setTaskStatus(testEpicTask.epicStatusType());
         assertEquals(testEpicTask.getTaskStatus(), StatusType.NEW);
     }
+
     //Когда все подзадачи со статусом NEW
     @Test
     void epicStatusTypeShouldBeNewWhenAllSubTaskStatusTypeNew() {
@@ -38,6 +42,7 @@ class EpicTaskTest {
         testEpicTask.setTaskStatus(testEpicTask.epicStatusType());
         assertEquals(testEpicTask.getTaskStatus(), StatusType.NEW);
     }
+
     //Когда все подзадачи со статусом DONE
     @Test
     void epicStatusTypeShouldBeDoneWhenAllSubTaskStatusTypeDone() {
@@ -50,6 +55,7 @@ class EpicTaskTest {
         testEpicTask.setTaskStatus(testEpicTask.epicStatusType());
         assertEquals(testEpicTask.getTaskStatus(), StatusType.DONE);
     }
+
     //Когда есть подзадачи со статусами NEW и DONE
     @Test
     void epicStatusTypeShouldBeInProgressWhenSomeSubTaskStatusTypeNewAndStatusTypeDone() {
@@ -60,6 +66,7 @@ class EpicTaskTest {
         testEpicTask.setTaskStatus(testEpicTask.epicStatusType());
         assertEquals(testEpicTask.getTaskStatus(), StatusType.IN_PROGRESS);
     }
+
     //Когда все подзадачи со статусом IN_PROGRESS
     @Test
     void epicStatusTypeShouldBeInProgressWhenAllSubTaskStatusTypeInProgress() {

@@ -3,11 +3,11 @@ package ru.mikhailantonov.taskmanager.manager.tasks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.mikhailantonov.taskmanager.util.exceptions.ManagerSaveException;
-import ru.mikhailantonov.taskmanager.util.Managers;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
+import ru.mikhailantonov.taskmanager.util.Managers;
+import ru.mikhailantonov.taskmanager.util.exceptions.ManagerSaveException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
 

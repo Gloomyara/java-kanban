@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 import ru.mikhailantonov.taskmanager.manager.tasks.InMemoryTaskManager;
 import ru.mikhailantonov.taskmanager.server.exceptions.HttpClientException;
 import ru.mikhailantonov.taskmanager.server.handlers.LocalDateTimeTypeAdapter;
+import ru.mikhailantonov.taskmanager.server.handlers.TaskDeserializer;
 import ru.mikhailantonov.taskmanager.task.EpicTask;
 import ru.mikhailantonov.taskmanager.task.SubTask;
 import ru.mikhailantonov.taskmanager.task.Task;
 import ru.mikhailantonov.taskmanager.task.enums.StatusType;
-import ru.mikhailantonov.taskmanager.server.handlers.TaskDeserializer;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -336,7 +336,7 @@ class HttpTaskServerTest {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
             if (code == HttpURLConnection.HTTP_OK) {
-                response =  resp.body();
+                response = resp.body();
             } else {
                 throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
             }
@@ -346,7 +346,8 @@ class HttpTaskServerTest {
         JsonElement jsonElementTasks = JsonParser.parseString(response);
         JsonArray array = jsonElementTasks.getAsJsonArray();
 
-        Type taskType = new TypeToken<List<Task>>(){}.getType();
+        Type taskType = new TypeToken<List<Task>>() {
+        }.getType();
         List<Task> tasks = gson.fromJson(array, taskType);
 
         for (Task task : tasks) {
@@ -368,7 +369,7 @@ class HttpTaskServerTest {
             HttpResponse<String> resp = client.send(request, HttpResponse.BodyHandlers.ofString());
             int code = resp.statusCode();
             if (code == HttpURLConnection.HTTP_OK) {
-                response =  resp.body();
+                response = resp.body();
             } else {
                 throw new HttpClientException("Загрузка данных c сервера по ключу: tasks/ не удалась. Код ответа: " + code);
             }
