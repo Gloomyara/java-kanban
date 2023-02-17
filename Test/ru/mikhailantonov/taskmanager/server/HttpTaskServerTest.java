@@ -346,8 +346,7 @@ class HttpTaskServerTest {
         JsonElement jsonElementTasks = JsonParser.parseString(response);
         JsonArray array = jsonElementTasks.getAsJsonArray();
 
-        Type taskType = new TypeToken<List<Task>>() {
-        }.getType();
+        Type taskType = new TypeToken<List<Task>>() {}.getType();
         List<Task> tasks = gson.fromJson(array, taskType);
 
         for (Task task : tasks) {
